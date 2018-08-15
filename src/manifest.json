@@ -19,7 +19,7 @@
       "19": "img/482.png",          
       "38": "img/482.png"          
     },
-    "default_popup": "main.html"
+    "default_popup": "popup.html"
   },
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "web_accessible_resources": [
