@@ -1,0 +1,25 @@
+{
+  "name": "selfkey-connect",
+  "version": "0.1.0",
+  "description": "SelfKey Connect Browser Extension",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kyc-chain/selfkey-connect.git"
+  },
+  "author": "Ben Gervais <ben@selfkey.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kyc-chain/selfkey-connect/issues"
+  },
+  "homepage": "https://github.com/kyc-chain/selfkey-connect#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "cz-conventional-changelog": "^2.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
