@@ -2,15 +2,25 @@
 
 var port = chrome.runtime.connect({name: 'LWS_INIT'})
 
+// this should handle all the errors right? :D
+port.onMessage.addListener(msg => {
+	if (msg.error) {
+		uiState('error', msg.error)
+	}
+})
+
+// attempt to load initial UI state with wallets list
 displayWallets()
 
 // requests array of wallets from IDW
 function getWallets() {
 	return new Promise((resolve,reject) => {
+		console.log('here1')
 		port.postMessage({
 			request: 'wallets'
 		})
 		port.onMessage.addListener(msg => {
+			console.log('here??')
 			if (msg.response === 'wallets') {
 				resolve(msg.wallets)
 			} else {
@@ -41,7 +51,9 @@ function wLoop(wallets) {
 
 // pull all the wallets from the IDW and display the list in the UI
 function displayWallets() {
+	console.log('here')
 	getWallets().then(wallets => {
+		console.log('HERE')
 		wLoop(wallets).then(() => {
 			document
 				.getElementById("walletDiv")

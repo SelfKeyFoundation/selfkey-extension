@@ -1,12 +1,23 @@
 'use strict'
 
-// WEBSOCKET MESSAGE OBJECT FORMAT EXAMPLE
+// WEBSOCKET REQUEST MESSAGE OBJECT FORMAT EXAMPLE
 //
 // {
-// 	"i" : "wallet", (OPTIONS: wallet, wallets, info, password, signature)
+// 	"request" : "wallet", (OPTIONS: wallet, wallets, info, password, signature)
 // 	"pubKey":"0x1234abcd",
 // 	"password":1234,
 // 	"nonce":"123412341234"
+// }
+
+// RESPONSE
+// {
+// 	response: 'wallet',
+// 	wallets: [
+// 		{
+// 			pubKey: '0xabcd1234',
+// 			status: 'locked'
+// 		}
+// 	]
 // }
 
 // Open up an ongoing connection for message passing
@@ -39,7 +50,7 @@ chrome.runtime.onConnect.addListener(port => {
 				console.log('GET WALLETS')
 				
 				ws.send(JSON.stringify({
-					"request":"wallets"
+					"request": "wallets"
 				}))
 				
 				ws.onmessage = event => {
@@ -70,10 +81,10 @@ chrome.runtime.onConnect.addListener(port => {
 			} else if (msg.request == 'attributes') {
 				
 				console.log('ATTR_REQ')
-				console.log(config.attributes)
+				console.log(config.required)
 
 				ws.send(JSON.stringify({
-					"i" : "info",
+					"request" : "info",
 					"wid": msg.wid,
 					"required": config.attributes
 				}))
@@ -89,11 +100,9 @@ chrome.runtime.onConnect.addListener(port => {
 			} else if (msg.request == 'auth') {
 				
 				console.log('AUTH_REQ')
-				console.log(config.nonce)
 				
 				ws.send(JSON.stringify({
-					"i" : "signature",
-					"nonce": config.nonce,
+					"request" : "signature",
 					"pubKey": msg.pubKey
 				}))
 
