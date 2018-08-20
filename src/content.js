@@ -1,7 +1,7 @@
 'use strict'
 
 var port = chrome.runtime.connect({name: 'LWS_INIT'})
-var config = document.getElementById('lwsConfig').innerHTML
+var config = JSON.stringify(document.getElementById('lwsConfig').innerHTML)
 
 port.postMessage({
 	request: 'init', 

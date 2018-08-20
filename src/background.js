@@ -86,7 +86,7 @@ chrome.runtime.onConnect.addListener(port => {
 				ws.send(JSON.stringify({
 					"request" : "info",
 					"wid": msg.wid,
-					"required": config.attributes
+					"required": config.required
 				}))
 
 				ws.onmessage = event => {
