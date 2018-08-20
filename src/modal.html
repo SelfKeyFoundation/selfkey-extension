@@ -1,23 +1,4 @@
-'use strict'
-
-var port = chrome.runtime.connect({name: 'LWS_INIT'})
-var config = document.getElementById('lwsConfig').innerHTML
-
-port.postMessage({
-	request: 'init', 
-	config: config
-})
-
-port.onMessage.addListener(msg => {
-	if (msg.response === 'pong') {
-		console.log('connected: true')
-	} else {
-		console.log('connected: false')
-	}
-})
-
-//LWS Modal w/ iFrame
-document.getElementById('lwsContent').innerHTML += `<div class="modal fade" id="skLogin" tabindex="-1" role="dialog" aria-labelledby="skLoginLabel">
+<div class="modal fade" id="skLogin" tabindex="-1" role="dialog" aria-labelledby="skLoginLabel">
     <div class="modal-dialog text-center" role="document">
         <div class="modal-content">
             <div class="modal-header" style="font-family: 'Proxima Nova','Helvetica Neue', Helvetica, Arial, sans-serif; background: #1e7287; color: #fff;"><span class="pull-left"><li class="dropdown sk-logo"><a class="dropdown-toggle" href="#" data-toggle="dropdown"><img src="images/self-key-icon.png" srcset="images/self-key-icon@2x.png 2x, images/self-key-icon@3x.png 3x" class="btn-selfkey-logo">&nbsp;&nbsp;Login with SelfKey</a><ul class="dropdown-menu"><li><a id="aboutSK" href="https://selfkey.org" target="_blank">About Selfkey</a></li><li><a id="helpSK" href="https://help.selfkey.org" target="_blank">Help and Support</a></li></ul></li></span>
@@ -52,5 +33,4 @@ document.getElementById('lwsContent').innerHTML += `<div class="modal fade" id="
             </div>
         </div>
     </div>
-</div>`
-
+</div>
