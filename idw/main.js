@@ -269,7 +269,7 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 					ws.send(
 						JSON.stringify({
 							response: 'wallets',
-							wallets: allWallets
+							data: { wallets: allWallets }
 						})
 					);
 				});
@@ -285,7 +285,7 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 					ws.send(
 						JSON.stringify({
 							response: 'wallet',
-							wallet: singleWallet
+							data: { wallet: singleWallet }
 						})
 					);
 				});
@@ -294,7 +294,12 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 			// request to unlock keystore file with password
 			if (p.request === 'unlock') {
 				getPassword(p.pubKey, p.password).then(check => {
-					ws.send(JSON.stringify(check));
+					ws.send(
+						JSON.stringify({
+							response: 'unlock',
+							data: { check }
+						})
+					);
 				});
 			}
 
@@ -304,7 +309,7 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 					ws.send(
 						JSON.stringify({
 							response: 'attributes',
-							attributes: userInfo
+							data: { attributes: userInfo }
 						})
 					);
 				});
@@ -316,7 +321,7 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 					ws.send(
 						JSON.stringify({
 							response: 'auth',
-							message: authRes
+							data: { message: authRes }
 						})
 					);
 				});

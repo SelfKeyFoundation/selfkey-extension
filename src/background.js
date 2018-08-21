@@ -1,135 +1,83 @@
 'use strict';
 
-// WEBSOCKET REQUEST MESSAGE OBJECT FORMAT EXAMPLE
-//
-// {
-// 	"request" : "wallet", (OPTIONS: wallet, wallets, info, password, signature)
-// 	"pubKey":"0x1234abcd",
-// 	"password":1234,
-// 	"nonce":"123412341234"
-// }
+const WS_URL = 'ws://localhost:8898';
+const PORT_NAME = 'LWS_INIT';
+const ALLOWED_REQUESTS = ['init', 'wallets', 'unlock', 'attributes', 'auth'];
 
-// RESPONSE
-// {
-// 	response: 'wallet',
-// 	wallets: [
-// 		{
-// 			pubKey: '0xabcd1234',
-// 			status: 'locked'
-// 		}
-// 	]
-// }
+const handleWSMessage = ctx => evt => {
+	let data = JSON.parse(evt.data);
+	if (!data.response) {
+		console.error('no response field in ws message');
+		return;
+	}
+	ctx.port.postMessage(data);
+};
 
-// Open up an ongoing connection for message passing
-chrome.runtime.onConnect.addListener(port => {
-	// set the port name LWS_INIT
-	console.assert(port.name === 'LWS_INIT');
-	// create a websocket connection with the IDW
-	const ws = new WebSocket('ws://localhost:8898');
-	// listening for messages
-	port.onMessage.addListener(msg => {
-		// handle error
-		ws.onopen = function(event) {
-			// handle error
-			console.log('WS OPEN');
-			let config;
-
-			// init
-			if (msg.request === 'init') {
-				console.log('LWS_INIT');
-
-				config = msg.config;
-
-				port.postMessage({
-					response: 'pong'
-				});
-
-				// get wallets
-			} else if (msg.request === 'wallets') {
-				console.log('GET WALLETS');
-
-				ws.send(
-					JSON.stringify({
-						request: 'wallets'
-					})
-				);
-
-				ws.onmessage = event => {
-					port.postMessage({
-						response: 'wallets',
-						wallets: JSON.parse(event.data)
-					});
-				};
-
-				// unlock keystore
-			} else if (msg.request === 'unlock') {
-				console.log('UNLOCK');
-
-				ws.send(
-					JSON.stringify({
-						request: 'password',
-						pubKey: msg.pubKey,
-						password: msg.password
-					})
-				);
-
-				ws.onmessage = event => {
-					port.postMessage({
-						response: 'unlock'
-					});
-				};
-
-				// check attributes and documents
-			} else if (msg.request === 'attributes') {
-				console.log('ATTR_REQ');
-				console.log(config.required);
-
-				ws.send(
-					JSON.stringify({
-						request: 'info',
-						wid: msg.wid,
-						required: config.required
-					})
-				);
-
-				ws.onmessage = event => {
-					port.postMessage({
-						response: 'attributes',
-						user: event.data
-					});
-				};
-
-				// submit authentication request
-			} else if (msg.request === 'auth') {
-				console.log('AUTH_REQ');
-
-				ws.send(
-					JSON.stringify({
-						request: 'signature',
-						pubKey: msg.pubKey
-					})
-				);
-
-				ws.onmessage = event => {
-					port.postMessage({
-						response: 'unlock'
-					});
-				};
-
-				// handle errors
-			} else {
-				port.postMessage({
-					error: 'invalid message request'
-				});
-			}
-		};
-
-		// handle errors
-		ws.onclosed = function(event) {
-			console.log('WS CLOSED');
-			port.postMessage({
-				error: 'websocket disconnected'
-			});
-		};
+const handleWSClose = ctx => () => {
+	console.log('WS CLOSED');
+	ctx.port.postMessage({
+		error: 'websocket disconnected'
 	});
-});
+};
+
+const handleWSError = () => evt => {
+	console.error('ws error', evt);
+};
+
+const initWS = ctx => {
+	const ws = new WebSocket(WS_URL);
+	ws.addEventListener('message', handleWSMessage(ctx));
+	ws.addEventListener('close', handleWSClose(ctx));
+	ws.addEventListener('error', handleWSError(ctx));
+	return ws;
+};
+
+const handlePortMessage = ctx => msg => {
+	const port = ctx.port;
+	const ws = ctx.ws;
+
+	if (!msg.request || !ALLOWED_REQUESTS.includes(msg.request)) {
+		port.postMessage({
+			error: 'invalid request message'
+		});
+		return;
+	}
+
+	if (msg.readyState !== 1) {
+		port.postMessage({
+			response: msg.data.request,
+			error: 'ws socket not open'
+		});
+		return;
+	}
+
+	if (msg.request === 'init') {
+		ctx.config = msg.config;
+		port.postMessage({
+			response: 'init'
+		});
+		return;
+	}
+
+	let wsMessage = Object.assign({}, msg.data);
+
+	if (msg.request === 'attributes') {
+		wsMessage.required = ctx.config.required || ctx.config.attributes;
+	}
+
+	ws.send(JSON.stringify(wsMessage));
+};
+
+const handleConnection = port => {
+	console.assert(port.port.name === PORT_NAME);
+	const ctx = {};
+	ctx.port = port;
+	ctx.ws = initWS(ctx);
+	port.onMessage.addListener(handlePortMessage(ctx));
+};
+
+const main = () => {
+	chrome.runtime.onConnect.addListener(handleConnection);
+};
+
+main();
