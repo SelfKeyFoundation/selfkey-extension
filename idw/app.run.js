@@ -1,3 +1,4 @@
+/* global $rootScope, Wallet, $state */
 /**
  * LWS Send Data to Main Process
  */
@@ -28,12 +29,7 @@ ipcRenderer.on('reqPrivKey', (event, pubKey) => {
 });
 
 ipcRenderer.on('lwsUnlock', (event, data) => {
-	$rootScope.wallet = new Wallet(
-		data.id,
-		data.privateKey,
-		data.publicKey,
-		data.keystoreFilePath
-	);
+	$rootScope.wallet = new Wallet(data.id, data.privateKey, data.publicKey, data.keystoreFilePath);
 	ipcRenderer.send('unlock-wallet', data.privateKey);
 	let promises = [];
 	promises.push($rootScope.wallet.loadIdAttributes());

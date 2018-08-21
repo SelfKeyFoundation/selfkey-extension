@@ -1,3 +1,4 @@
+/* global electron, path, app */
 /**
  * LWS ID Wallet Main Process Integration
  **/
@@ -26,10 +27,7 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 		client: 'sqlite3',
 		useNullAsDefault: true,
 		connection: {
-			filename: path.join(
-				electron.app.getPath('userData'),
-				'IdentityWalletStorage.sqlite'
-			)
+			filename: path.join(electron.app.getPath('userData'), 'IdentityWalletStorage.sqlite')
 		}
 	});
 
@@ -153,6 +151,8 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 
 	// check if a password can unlock a keystore file
 	function getPassword(pubKey, password) {
+		// TODO: where does walletsDirectoryPath comes from ?
+		let walletsDirectoryPath;
 		return new Promise((resolve, reject) => {
 			getWallet(pubKey).then(wallet => {
 				if (wallet.message) {
@@ -203,25 +203,27 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 
 	// get the nonce from the server
 	function getNonce(url) {
-		request.get({
-			url: url
-		}, (err, body) => {
-			return body
-		})
+		request.get(
+			{
+				url: url
+			},
+			(err, body) => {
+				console.error(err);
+				return body;
+			}
+		);
 	}
 
 	// get the attribute data needed for auth submission
-	function getAttributes(required) {
-
-	}
+	function getAttributes(required) {}
 
 	// get the document data needed for auth submission
-	function getDocuments(required) {
-
-	}
+	function getDocuments(required) {}
 
 	// send the auth request to the server implementation
 	function authLWS(url, pubKey, required) {
+		// TODO: where does nonce comes from?
+		let nonce;
 		return new Promise((resolve, reject) => {
 			const form = {
 				pubKey: pubKey,
@@ -229,14 +231,18 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 				signature: getSignature(pubKey, nonce),
 				attributes: getAttributes(required),
 				documents: getDocuments(required)
-			}
-			request.post({
-				url: url,
-				formData: form
-			}, (err, body) => {
-				resolve(body)
-			})
-		})
+			};
+			request.post(
+				{
+					url: url,
+					formData: form
+				},
+				(err, body) => {
+					console.error(err);
+					resolve(body);
+				}
+			);
+		});
 	}
 	/**
 	 * LWS Common end
@@ -246,7 +252,6 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 	 * LWS WebSockets
 	 **/
 	const WebSocket = require('ws');
-	const util = require('util');
 
 	// create a websocket server
 	const wss = new WebSocket.Server({ port: 8898 });
@@ -261,10 +266,12 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 			// request for all wallets
 			if (p.request === 'wallets') {
 				getWallets().then(allWallets => {
-					ws.send(JSON.stringify({
-						"response": "wallets",
-						"wallets": allWallets
-					}));
+					ws.send(
+						JSON.stringify({
+							response: 'wallets',
+							wallets: allWallets
+						})
+					);
 				});
 			}
 
@@ -275,10 +282,12 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 						pubKey: check.pubKey,
 						status: check.status
 					};
-					ws.send(JSON.stringify({
-						"response": "wallet",
-						"wallet": singleWallet
-					}));
+					ws.send(
+						JSON.stringify({
+							response: 'wallet',
+							wallet: singleWallet
+						})
+					);
 				});
 			}
 
@@ -292,23 +301,26 @@ electron.ipcMain.on('LWSInit', (event, arg) => {
 			// request to check user id attributes
 			if (p.request === 'attributes') {
 				getUserInfo(p.wid, p.required).then(userInfo => {
-					ws.send(JSON.stringify({
-						"response": "attributes",
-						"attributes": userInfo
-					}));
+					ws.send(
+						JSON.stringify({
+							response: 'attributes',
+							attributes: userInfo
+						})
+					);
 				});
 			}
 
 			// request to submit auth request to server
 			if (p.request === 'auth') {
 				authLWS(p.auth_url, p.pubKey, getNonce(p.nonce_url)).then(authRes => {
-					ws.send(JSON.stringify({
-						"response": "auth",
-						"message": authRes
-					}));
-				})
+					ws.send(
+						JSON.stringify({
+							response: 'auth',
+							message: authRes
+						})
+					);
+				});
 			}
-			
 		});
 	});
 	/**

@@ -1,14 +1,14 @@
-(function(window, document){
-'use strict'
-// injected to customer web page
+(function(window, document) {
+	'use strict';
+	// injected to customer web page
 
-function injectHTML(el, data){
-    if (!el && !el.innerHTML ) return;
-    el.innerHTML = tpl(data);
-}
+	function injectHTML(el, data) {
+		if (!el && !el.innerHTML) return;
+		el.innerHTML = tpl(data);
+	}
 
-function tpl(data) {
-    return `
+	function tpl(data) {
+		return `
         <div class="modal fade" id="skLogin" tabindex="-1" role="dialog" aria-labelledby="skLoginLabel">
             <div class="modal-dialog text-center" role="document">
                 <div class="modal-content">
@@ -23,7 +23,9 @@ function tpl(data) {
                         </style>
                         <div class="text-center">
                             <div class="lws_wrapper" id="lws_wrapper" style="display: none;">
-                                <iframe id="lws_iframe" src="${data.mainUrl}" scrolling="yes" style="display: none;"></iframe>
+                                <iframe id="lws_iframe" src="${
+									data.mainUrl
+								}" scrolling="yes" style="display: none;"></iframe>
                             </div>
                         </div>
                         <div id="lws_default">
@@ -45,67 +47,65 @@ function tpl(data) {
                 </div>
             </div>
         </div>
-    `
-}
+    `;
+	}
 
-function resolveDomElements(el){
-    if (Array.isArray(el)){
-        return el;
-    }
-    if (typeof el === 'sting'){
-        return document.querySelectorAll(el);
-    }
-    return [el];
-}
+	function resolveDomElements(el) {
+		if (Array.isArray(el)) {
+			return el;
+		}
+		if (typeof el === 'string') {
+			return document.querySelectorAll(el);
+		}
+		return [el];
+	}
 
-function listenToAuthResponse(cb){
-    // TODO: implement auth resonse callback
-}
+	function listenToAuthResponse(cb) {
+		// TODO: implement auth resonse callback
+	}
 
-function initLWS(config){
-    if (!config.el){
-        console.error("LWS: please provide dom element or selector for LWS");
-        return;
-    }
-    var els = resolveDomElements(config.el);
-    els.forEach(function initLWSForDomElement(){
-        injectHTML(el, window.lws.data);
-    });
-    var sendConf = {
-        requested: el.requested,
-        attributes: el.attributes,
-        path: el.path
-    }
+	function initLWS(config) {
+		if (!config.el) {
+			console.error('LWS: please provide dom element or selector for LWS');
+			return;
+		}
+		var els = resolveDomElements(config.el);
+		els.forEach(function initLWSForDomElement(el) {
+			injectHTML(el, window.lws.data);
+		});
+		var sendConf = {
+			requested: config.requested,
+			attributes: config.attributes,
+			path: config.path
+		};
 
-    if (config.onAuthResponse && typeof config.onAuthResponse == 'function'){
-        listenToAuthResponse(config.onAuthResponse);
-        sendConf.hasAuthCb = true;
-    }
+		if (config.onAuthResponse && typeof config.onAuthResponse === 'function') {
+			listenToAuthResponse(config.onAuthResponse);
+			sendConf.hasAuthCb = true;
+		}
 
-    sendInitMessage(config, window.lws.data)
-}
+		sendInitMessage(config, window.lws.data);
+	}
 
-function teardownLWS(){
-    // TODO: implement teardown LWS
-}
+	function teardownLWS() {
+		// TODO: implement teardown LWS
+	}
 
-function sendInitMessage(config, data){
-    let msg = {
-        type: 'init',
-        hash: data,
-        config: config
-    };
+	function sendInitMessage(config, data) {
+		let msg = {
+			type: 'init',
+			hash: data,
+			config: config
+		};
+		window.postMessage(msg);
+	}
 
-}
+	function main() {
+		window.lws.control = {
+			init: initLWS,
+			teardown: teardownLWS
+		};
+	}
 
-function main(){
-    window.lws.control = {
-        init: initLWS,
-        teardown: teardownLWS
-    };
-}
-
-main();
-
+	main();
 })(window, document);
-
