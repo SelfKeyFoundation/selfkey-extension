@@ -1,16 +1,29 @@
+/* eslint-disable */
 'use strict';
 /* global $ */
-var port = chrome.runtime.connect({ name: 'LWS_INIT' });
 
-// this should handle all the errors right? :D
-port.onMessage.addListener(msg => {
-	if (msg.error) {
-		uiState('error', msg.error);
-	}
-});
+const PORT_NAME = 'LWS_INIT';
+
+const connectToBg = () => {
+	var port = chrome.runtime.connect({ name: 'LWS_INIT' });
+
+	// this should handle all the errors right? :D
+	port.onMessage.addListener(msg => {
+		if (msg.error) {
+			uiState('error', msg.error);
+		}
+	});
+	return port;
+};
+
+const main = () => {
+	connectToBg();
+	displayWallets();
+};
+
+main();
 
 // attempt to load initial UI state with wallets list
-displayWallets();
 
 // requests array of wallets from IDW
 function getWallets() {

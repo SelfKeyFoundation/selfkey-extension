@@ -3,21 +3,71 @@
 const WS_URL = 'ws://localhost:8898';
 const PORT_NAME = 'LWS_INIT';
 const ALLOWED_REQUESTS = ['init', 'wallets', 'unlock', 'attributes', 'auth'];
+const MSG_SRC = 'lws_bg';
+const WS_REQ_TIMEOUT = 2000;
+
+const bg = {
+	msgId: 0,
+	ports: [],
+	ws: null,
+	wsReqs: {}
+};
+
+// TODO: handle ws disconnects and reconnects
+
+const fmtMessage = (msg, req) => {
+	req = req || {};
+	msg.type = msg.type || req.type;
+	msg.meta = msg.meta || {};
+	let id = msg.meta.id;
+	if (!id && req.meta && req.meta.id) {
+		id = req.meta.id;
+	}
+	msg.meta.id = id || `${MSG_SRC}_${bg.msgId++}`;
+	msg.meta.src = msg.meta.src || MSG_SRC;
+	if (!msg.type && msg.error) {
+		msg.type = 'error';
+	}
+};
+
+const sendToWs = (msg, sendResponse) => {
+	const msgId = msg.meta.id;
+	bg.wsReqs[msgId] = { req: msg };
+	bg.wsReqs[msgId].handleRes = res => {
+		clearTimeout(bg.wsReqs.timeout);
+		sendResponse(fmtMessage(msg));
+		delete bg.wsReqs[msgId];
+	};
+	bg.wsReqs[msgId].timeout = setTimeout(() => {
+		bg.wsReqs[msgId].handleRes({ error: 'response timed out' });
+	}, WS_REQ_TIMEOUT);
+};
+
+const sendToAllPorts = (msg, sendResponse) => {
+	bg.ports.forEach(port => {
+		port.postMessage(msg);
+	});
+};
 
 const handleWSMessage = ctx => evt => {
-	let data = JSON.parse(evt.data);
-	if (!data.response) {
-		console.error('no response field in ws message');
+	let msg = JSON.parse(evt.data);
+	let id = (msg.meta || {}).id;
+	let req = bg.wsReqs[id];
+	if (!req) {
+		console.log('unknown message');
 		return;
 	}
-	ctx.port.postMessage(data);
+	req.handleRes(msg);
 };
 
 const handleWSClose = ctx => () => {
 	console.log('WS CLOSED');
-	ctx.port.postMessage({
-		error: 'websocket disconnected'
-	});
+	sendToAllPorts(
+		fmtMessage({
+			error: 'websocket disconnected'
+		})
+	);
+	ctx.port.postMessage();
 };
 
 const handleWSError = () => evt => {
@@ -32,51 +82,73 @@ const initWS = ctx => {
 	return ws;
 };
 
-const handlePortMessage = ctx => msg => {
-	const port = ctx.port;
-	const ws = ctx.ws;
+const handlePortMessage = ctx => (msg, port) => {
+	const sendResponse = msg => port.postMessage(msg);
 
-	if (!msg.request || !ALLOWED_REQUESTS.includes(msg.request)) {
-		port.postMessage({
-			error: 'invalid request message'
-		});
+	if (!msg.type || !ALLOWED_REQUESTS.includes(msg.type)) {
+		sendResponse(
+			fmtMessage(
+				{
+					error: 'invalid request message'
+				},
+				msg
+			)
+		);
 		return;
 	}
 
-	if (msg.readyState !== 1) {
-		port.postMessage({
-			response: msg.data.request,
-			error: 'ws socket not open'
-		});
+	if (!bg.ws || bg.ws.readyState !== 1) {
+		sendResponse(
+			fmtMessage(
+				{
+					error: 'ws socket not open'
+				},
+				msg
+			)
+		);
 		return;
 	}
 
-	if (msg.request === 'init') {
+	if (msg.type === 'init') {
 		ctx.config = msg.config;
-		port.postMessage({
-			response: 'init'
-		});
+		sendResponse(
+			fmtMessage(
+				{
+					type: 'init'
+				},
+				msg
+			)
+		);
 		return;
 	}
 
-	let wsMessage = Object.assign({}, msg.data);
+	let wsMessage = fmtMessage({}, msg);
 
-	if (msg.request === 'attributes') {
-		wsMessage.required = ctx.config.required || ctx.config.attributes;
+	if (msg.type === 'attributes') {
+		wsMessage.payload.required = ctx.config.required;
 	}
-
-	ws.send(JSON.stringify(wsMessage));
+	sendToWs(wsMessage, ctx, sendResponse);
 };
 
 const handleConnection = port => {
 	console.assert(port.port.name === PORT_NAME);
-	const ctx = {};
-	ctx.port = port;
-	ctx.ws = initWS(ctx);
+	console.log('port connected');
+	bg.ports.push(port);
+	const ctx = {
+		port: port,
+		ws: bg.ws
+	};
 	port.onMessage.addListener(handlePortMessage(ctx));
+	port.onDisconnect(port => {
+		console.log('port disconnected');
+		let idx = bg.ports.indexOf(port);
+		if (idx < 0) return;
+		bg.ports.splice(idx, 1);
+	});
 };
 
 const main = () => {
+	bg.ws = initWS();
 	chrome.runtime.onConnect.addListener(handleConnection);
 };
 

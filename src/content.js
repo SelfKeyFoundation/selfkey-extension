@@ -2,6 +2,12 @@
 /* globals chrome */
 var LWS_CONTENT_SCRIPT_NAME = 'LWS_INIT';
 
+const MSG_SRC = 'lws_content';
+
+var contentScript = {
+	msgId: 0
+};
+
 function lwsClientInit(data) {
 	window.lws = { data: data };
 }
@@ -27,6 +33,21 @@ function injectInitial(data) {
 	window.lwsInjectComplete = true;
 }
 
+const fmtMessage = (msg, req) => {
+	req = req || {};
+	msg.type = msg.type || req.type;
+	msg.meta = msg.meta || {};
+	let id = msg.meta.id;
+	if (!id && req.meta && req.meta.id) {
+		id = req.meta.id;
+	}
+	msg.meta.id = id || `${MSG_SRC}_${contentScript.msgId++}`;
+	msg.meta.src = msg.meta.src || MSG_SRC;
+	if (!msg.type && msg.error) {
+		msg.type = 'error';
+	}
+};
+
 function generateHash() {
 	// TODO: make it crypto - secure
 	return Math.random();
@@ -35,34 +56,43 @@ function generateHash() {
 function initListeners() {
 	window.bgPort = chrome.runtime.connect({ name: LWS_CONTENT_SCRIPT_NAME });
 	window.bgPort.addEventListener('message', handleBgMessage);
+	window.bgPort.onDisconnect(() => {
+		console.error('bg port disconnected');
+	});
 	window.addEventListener('message', handleWebPageMessage, false);
 }
 
 function handleWebPageMessage(evt) {
-	if (!evt.data && !evt.data.type && evt.data.hash === window.hash) return;
-	switch (evt.data.type) {
+	var msg = evt.data;
+
+	if (!msg && !msg.type && !msg.meta && msg.meta.hash !== window.hash) return;
+	switch (msg.type) {
 		case 'init':
-			return sendInitToBg(evt.data);
+			return sendInitToBg(msg);
 	}
 }
 
 function handleBgMessage(msg) {
-	if (!msg.response) return;
-	switch (msg.response) {
+	if (!msg.type) return;
+	switch (msg.type) {
 		case 'init':
 			return handleInitFromBg(msg);
 	}
 }
 
-function sendInitToBg(data) {
-	if (data.config) {
+function sendInitToBg(msg) {
+	if (!msg.payload.config) {
 		console.error('No config provided');
 		return;
 	}
-	window.bgPort.postMessage({
-		request: 'init',
-		config: data.config
-	});
+	window.bgPort.postMessage(
+		fmtMessage(
+			{
+				payload: msg.payload.config
+			},
+			msg
+		)
+	);
 }
 
 function handleInitFromBg(msg) {
