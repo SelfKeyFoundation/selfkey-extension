@@ -94,8 +94,10 @@
 	function sendInitMessage(config, data) {
 		let msg = {
 			type: 'init',
-			hash: data,
-			config: config
+			payload: config,
+			meta: {
+				hash: data.hash
+			}
 		};
 		window.postMessage(msg);
 	}
