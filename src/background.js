@@ -4,7 +4,8 @@ const WS_URL = 'ws://localhost:8898';
 const PORT_NAME = 'LWS_INIT';
 const ALLOWED_REQUESTS = ['init', 'wallets', 'unlock', 'attributes', 'auth'];
 const MSG_SRC = 'lws_bg';
-const WS_REQ_TIMEOUT = 2000;
+const WS_REQ_TIMEOUT = 5000;
+const WS_RECONNECT_INTERVAL = 5000;
 
 const bg = {
 	msgId: 0,
@@ -43,7 +44,7 @@ const sendToWs = (msg, sendResponse) => {
 	}, WS_REQ_TIMEOUT);
 };
 
-const sendToAllPorts = (msg, sendResponse) => {
+const sendToAllPorts = msg => {
 	bg.ports.forEach(port => {
 		port.postMessage(msg);
 	});
@@ -61,13 +62,21 @@ const handleWSMessage = ctx => evt => {
 };
 
 const handleWSClose = ctx => () => {
-	console.log('WS CLOSED');
+	console.log('ws connection closed');
 	sendToAllPorts(
 		fmtMessage({
 			error: 'websocket disconnected'
 		})
 	);
-	ctx.port.postMessage();
+	bg.ws = null;
+	setTimeout(() => {
+		console.log('trying to reconnct ws');
+		initWS(ctx);
+	}, WS_RECONNECT_INTERVAL);
+};
+
+const handleWsOpen = ctx => () => {
+	console.log('ws connection established');
 };
 
 const handleWSError = () => evt => {
@@ -75,11 +84,11 @@ const handleWSError = () => evt => {
 };
 
 const initWS = ctx => {
-	const ws = new WebSocket(WS_URL);
+	const ws = (bg.ws = new WebSocket(WS_URL));
+	ws.addEventListener('open', handleWsOpen(ctx));
 	ws.addEventListener('message', handleWSMessage(ctx));
 	ws.addEventListener('close', handleWSClose(ctx));
 	ws.addEventListener('error', handleWSError(ctx));
-	return ws;
 };
 
 const handlePortMessage = ctx => (msg, port) => {
@@ -97,11 +106,12 @@ const handlePortMessage = ctx => (msg, port) => {
 		return;
 	}
 
-	if (!bg.ws || bg.ws.readyState !== 1) {
+	if (msg.type === 'init') {
+		ctx.config = msg.config;
 		sendResponse(
 			fmtMessage(
 				{
-					error: 'ws socket not open'
+					type: 'init'
 				},
 				msg
 			)
@@ -109,12 +119,11 @@ const handlePortMessage = ctx => (msg, port) => {
 		return;
 	}
 
-	if (msg.type === 'init') {
-		ctx.config = msg.config;
+	if (!bg.ws || bg.ws.readyState !== 1) {
 		sendResponse(
 			fmtMessage(
 				{
-					type: 'init'
+					error: 'ws socket not open'
 				},
 				msg
 			)
