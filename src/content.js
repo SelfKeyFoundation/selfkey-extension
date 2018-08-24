@@ -1,56 +1,116 @@
-'use strict'
+'use strict';
+/* globals chrome */
+var LWS_CONTENT_SCRIPT_NAME = 'LWS_INIT';
 
-var port = chrome.runtime.connect({name: 'LWS_INIT'})
-var config = JSON.stringify(document.getElementById('lwsConfig').innerHTML)
+const MSG_SRC = 'lws_content';
 
-port.postMessage({
-	request: 'init', 
-	config: config
-})
+var contentScript = {
+	msgId: 0
+};
 
-port.onMessage.addListener(msg => {
-	if (msg.response === 'pong') {
-		console.log('connected: true')
-	} else {
-		console.log('connected: false')
+function lwsClientInit(data) {
+	window.lws = { data: data };
+}
+
+function injectInitial(data) {
+	if (window.lwsInjectComplete) return;
+
+	var code =
+		'' +
+		'\n(function(data){' +
+		'\n' +
+		lwsClientInit.toString() +
+		'lwsClientInit(data);' +
+		'\n})(' +
+		JSON.stringify(data) +
+		');';
+
+	var s = document.createElement('script');
+	s.type = 'text/javascript';
+	s.textContent = code;
+	(document.head || document.documentElement).prepend(s);
+	s.remove();
+	window.lwsInjectComplete = true;
+}
+
+const fmtMessage = (msg, req) => {
+	req = req || {};
+	msg.type = msg.type || req.type;
+	msg.meta = msg.meta || {};
+	let id = msg.meta.id;
+	if (!id && req.meta && req.meta.id) {
+		id = req.meta.id;
 	}
-})
+	msg.meta.id = id || `${MSG_SRC}_${contentScript.msgId++}`;
+	msg.meta.src = msg.meta.src || MSG_SRC;
+	if (!msg.type && msg.error) {
+		msg.type = 'error';
+	}
+};
 
-//LWS Modal w/ iFrame
-document.getElementById('lwsContent').innerHTML += `<div class="modal fade" id="skLogin" tabindex="-1" role="dialog" aria-labelledby="skLoginLabel">
-    <div class="modal-dialog text-center" role="document">
-        <div class="modal-content">
-            <div class="modal-header" style="font-family: 'Proxima Nova','Helvetica Neue', Helvetica, Arial, sans-serif; background: #1e7287; color: #fff;"><span class="pull-left"><li class="dropdown sk-logo"><a class="dropdown-toggle" href="#" data-toggle="dropdown"><img src="images/self-key-icon.png" srcset="images/self-key-icon@2x.png 2x, images/self-key-icon@3x.png 3x" class="btn-selfkey-logo">&nbsp;&nbsp;Login with SelfKey</a><ul class="dropdown-menu"><li><a id="aboutSK" href="https://selfkey.org" target="_blank">About Selfkey</a></li><li><a id="helpSK" href="https://help.selfkey.org" target="_blank">Help and Support</a></li></ul></li></span>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-            </div>
-            <div class="modal-body" style="color: rgba(0,0,0,0.6);">
-                <style>
-                iframe {
-                    border-width: 0;
-                }
-                </style>
-                <div class="text-center">
-                    <div class="lws_wrapper" id="lws_wrapper" style="display: none;">
-                        <iframe id="lws_iframe" src="chrome-extension://knldjmfmopnpolahpmmgbagdohdnhkik/main.html" scrolling="yes" style="display: none;"></iframe>
-                    </div>
-                </div>
-                <div id="lws_default">
-                    <!-- <div class="col-md-offset-2 col-md-8">-->
-                    <p>In order to use the Login with SelfKey service, please follow these steps:</p>
-                    <p>1. Install and Enable the SelfKey Browser Extension from the Chrome Web Store:</p><a class="btn btn-large btn-primary" href="https://selfkey.download.bencrypto.com" target="_blank" style="margin: 10px;"><img src="images/chrome.png">  Download SelfKey Browser Extension</a>
-                    <br><strong style="color: #ff0000;">IMPORTANT: Make sure the SelfKey Browser Extension is enable by checking for the SelfKey icon the top right corner of your Chrome browser</strong>
-                    <br>
-                    <br>
-                    <p>2. Install and Setup your SelfKey ID Wallet</p><a class="btn btn-large btn-info" href="https://selfkey.download.bencrypto.com" target="_blank" style="margin: 10px;"><img src="images/48x48.png">  Download SelfKey ID Wallet</a>
-                    <br>
-                    <br>
-                    <p>Once you have downloaded and enabled the SelfKey Browser Extension and installed the SelfKey ID Wallet click the verify button below:</p><a></a>
-                    <input class="btn btn-success btn-large" type="button" value="Verify SelfKey Login Installed" onclick="window.location.reload()">
-                    <br>
-                    <br>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>`
+function generateHash() {
+	// TODO: make it crypto - secure
+	return Math.random();
+}
 
+function initListeners() {
+	window.bgPort = chrome.runtime.connect({ name: LWS_CONTENT_SCRIPT_NAME });
+	window.bgPort.addEventListener('message', handleBgMessage);
+	window.bgPort.onDisconnect(() => {
+		console.error('bg port disconnected');
+	});
+	window.addEventListener('message', handleWebPageMessage, false);
+}
+
+function handleWebPageMessage(evt) {
+	var msg = evt.data;
+
+	if (!msg && !msg.type && !msg.meta && msg.meta.hash !== window.hash) return;
+	switch (msg.type) {
+		case 'init':
+			return sendInitToBg(msg);
+	}
+}
+
+function handleBgMessage(msg) {
+	if (!msg.type) return;
+	switch (msg.type) {
+		case 'init':
+			return handleInitFromBg(msg);
+	}
+}
+
+function sendInitToBg(msg) {
+	if (!msg.payload.config) {
+		console.error('No config provided');
+		return;
+	}
+	window.bgPort.postMessage(
+		fmtMessage(
+			{
+				payload: msg.payload.config
+			},
+			msg
+		)
+	);
+}
+
+function handleInitFromBg(msg) {
+	console.log('connected: true');
+}
+
+function main() {
+	var hash = generateHash();
+	window.hash = hash;
+	initListeners();
+	var data = {
+		clientUrl: chrome.runtime.getUrl('lws-inject.js'),
+		clientTagId: 'lws-js-sdk',
+		iframeUrl: chrome.runtime.getUrl('main.html'),
+		originHash: hash,
+		id: chrome.runtime.id
+	};
+	injectInitial(data);
+}
+
+main();

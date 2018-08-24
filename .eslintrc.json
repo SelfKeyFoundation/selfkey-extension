@@ -1,0 +1,38 @@
+{
+    "extends": [
+       "standard",
+       "prettier",
+       "prettier/standard",
+       "plugin:react/recommended"
+    ],
+    "plugins": [
+       "prettier",
+       "standard",
+       "mocha",
+       "react",
+       "jest"
+    ],
+    "parserOptions": {
+       "sourceType": "module",
+       "ecmaFeatures": {
+         "jsx": true
+       }
+    },
+    "parser": "babel-eslint",
+    "env": {
+       "browser": true,
+       "es6": true,
+       "webextensions": true,
+       "jest": true
+    },
+    "rules": {
+       "prettier/prettier": [
+          "error",
+          {
+             "singleQuote": true,
+             "semi": true
+          }
+       ],
+       "react/prop-types": 0
+    }
+ }
