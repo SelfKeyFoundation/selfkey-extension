@@ -1,8 +1,11 @@
 (function(window, document) {
 	'use strict';
-	// injected to customer web page
+	var MSG_SRC = 'lws_client';
+	var client = {
+		msgId: 0
+	};
 
-	function injectHTML(el, data) {
+	function injectHTML(el, tpl, data) {
 		if (!el && !el.innerHTML) return;
 		el.innerHTML = tpl(data);
 	}
@@ -60,8 +63,38 @@
 		return [el];
 	}
 
-	function listenToAuthResponse(cb) {
-		// TODO: implement auth resonse callback
+	function listenToAuthResponse(cb, data) {
+		client.onAuthResponse = cb;
+		window.addEventListener('message', handleAuthResponse);
+	}
+
+	function handleAuthResponse(evt) {
+		var data = evt.data;
+		// TODO: accept only messages from extension
+		console.log(evt.origin);
+		if (!data || !data.meta || data.meta.src !== 'lws_content' || !client.onAuthResponse) {
+			return;
+		}
+		client.onAuthResponse(data.error, data.payload);
+	}
+
+	function teardownAuthListener() {
+		client.onAuthResponse = null;
+		window.removeEventListener('message', handleAuthResponse);
+	}
+
+	function initDomElements(config, data) {
+		var els = (client.els = resolveDomElements(config.el));
+		els.forEach(function initLWSForDomElement(el) {
+			injectHTML(el, tpl, window.lws.data);
+		});
+	}
+
+	function teardownDomElements() {
+		client.els.forEach(el => {
+			injectHTML(el, () => '');
+		});
+		client.els = false;
 	}
 
 	function initLWS(config) {
@@ -69,26 +102,31 @@
 			console.error('LWS: please provide dom element or selector for LWS');
 			return;
 		}
-		var els = resolveDomElements(config.el);
-		els.forEach(function initLWSForDomElement(el) {
-			injectHTML(el, window.lws.data);
-		});
+		var data = window.lws.data;
+		client.config = config;
+		initDomElements(config, data);
 		var sendConf = {
-			requested: config.requested,
 			attributes: config.attributes,
 			path: config.path
 		};
 
 		if (config.onAuthResponse && typeof config.onAuthResponse === 'function') {
-			listenToAuthResponse(config.onAuthResponse);
+			listenToAuthResponse(config.onAuthResponse, data);
 			sendConf.hasAuthCb = true;
 		}
 
-		sendInitMessage(config, window.lws.data);
+		sendInitMessage(sendConf, data);
 	}
 
 	function teardownLWS() {
-		// TODO: implement teardown LWS
+		if (client.els) {
+			teardownDomElements();
+		}
+		if (client.onAuthResponse) {
+			teardownAuthListener();
+		}
+		sendTeardownMessage(window.lws.data);
+		client.config = null;
 	}
 
 	function sendInitMessage(config, data) {
@@ -96,7 +134,21 @@
 			type: 'init',
 			payload: config,
 			meta: {
-				hash: data.hash
+				hash: data.hash,
+				src: MSG_SRC,
+				id: MSG_SRC + '-' + client.msgId++
+			}
+		};
+		window.postMessage(msg);
+	}
+
+	function sendTeardownMessage(data) {
+		let msg = {
+			type: 'teardown',
+			meta: {
+				hash: data.hash,
+				src: MSG_SRC,
+				id: MSG_SRC + '-' + client.msgId++
 			}
 		};
 		window.postMessage(msg);

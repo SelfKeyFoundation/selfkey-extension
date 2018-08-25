@@ -55,8 +55,8 @@ function generateHash() {
 
 function initListeners() {
 	window.bgPort = chrome.runtime.connect({ name: LWS_CONTENT_SCRIPT_NAME });
-	window.bgPort.addEventListener('message', handleBgMessage);
-	window.bgPort.onDisconnect(() => {
+	window.bgPort.onMessage.addListener(handleBgMessage);
+	window.bgPort.onDisconnect.addListener(() => {
 		console.error('bg port disconnected');
 	});
 	window.addEventListener('message', handleWebPageMessage, false);
@@ -65,7 +65,7 @@ function initListeners() {
 function handleWebPageMessage(evt) {
 	var msg = evt.data;
 
-	if (!msg && !msg.type && !msg.meta && msg.meta.hash !== window.hash) return;
+	if (!msg || !msg.type || !msg.meta || msg.meta.hash !== window.hash) return;
 	switch (msg.type) {
 		case 'init':
 			return sendInitToBg(msg);
@@ -104,9 +104,9 @@ function main() {
 	window.hash = hash;
 	initListeners();
 	var data = {
-		clientUrl: chrome.runtime.getUrl('lws-inject.js'),
+		clientUrl: chrome.runtime.getURL('lws-inject.js'),
 		clientTagId: 'lws-js-sdk',
-		iframeUrl: chrome.runtime.getUrl('main.html'),
+		iframeUrl: chrome.runtime.getURL('main.html'),
 		originHash: hash,
 		id: chrome.runtime.id
 	};
