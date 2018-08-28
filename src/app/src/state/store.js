@@ -1,8 +1,9 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { routerReducer } from 'react-router-redux';
 import * as errorReducer from './error';
 
 export default function configureStore(initialState = {}) {
-	const rootReducer = combineReducers({ errorReducer });
+	const rootReducer = combineReducers({ errorReducer, routing: routerReducer });
 	return createStore(
 		rootReducer,
 		initialState,

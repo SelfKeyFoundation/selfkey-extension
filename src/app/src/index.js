@@ -5,9 +5,8 @@ import App from './views/App';
 import registerServiceWorker from './registerServiceWorker';
 
 import { syncHistoryWithStore } from 'react-router-redux';
-import { browserHistory } from 'react-router';
+import { browserHistory, Router, Route } from 'react-router';
 
-import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from './state/store';
 
@@ -17,7 +16,7 @@ const history = syncHistoryWithStore(browserHistory, reduxStore);
 const RootHtml = () => (
 	<ReduxProvider store={reduxStore}>
 		<Router history={history}>
-			<App />
+			<Route path="/" component={App} />
 		</Router>
 	</ReduxProvider>
 );
