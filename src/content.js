@@ -3,35 +3,11 @@
 var LWS_CONTENT_SCRIPT_NAME = 'LWS_INIT';
 
 const MSG_SRC = 'lws_content';
+const WP_SRC = 'lws_client';
 
 var contentScript = {
 	msgId: 0
 };
-
-function lwsClientInit(data) {
-	window.lws = { data: data };
-}
-
-function injectInitial(data) {
-	if (window.lwsInjectComplete) return;
-
-	var code =
-		'' +
-		'\n(function(data){' +
-		'\n' +
-		lwsClientInit.toString() +
-		'lwsClientInit(data);' +
-		'\n})(' +
-		JSON.stringify(data) +
-		');';
-
-	var s = document.createElement('script');
-	s.type = 'text/javascript';
-	s.textContent = code;
-	(document.head || document.documentElement).prepend(s);
-	s.remove();
-	window.lwsInjectComplete = true;
-}
 
 const fmtMessage = (msg, req) => {
 	req = req || {};
@@ -44,19 +20,19 @@ const fmtMessage = (msg, req) => {
 	msg.meta.id = id || `${MSG_SRC}_${contentScript.msgId++}`;
 	msg.meta.src = msg.meta.src || MSG_SRC;
 	if (!msg.type && msg.error) {
-		msg.type = 'error';
+		msg.error = true;
+		msg.payload = {
+			type: 'unknown',
+			message: 'Unknown error'
+		};
 	}
+	return msg;
 };
 
-function generateHash() {
-	// TODO: make it crypto - secure
-	return Math.random();
-}
-
 function initListeners() {
-	window.bgPort = chrome.runtime.connect({ name: LWS_CONTENT_SCRIPT_NAME });
-	window.bgPort.onMessage.addListener(handleBgMessage);
-	window.bgPort.onDisconnect.addListener(() => {
+	contentScript.bgPort = chrome.runtime.connect({ name: LWS_CONTENT_SCRIPT_NAME });
+	contentScript.bgPort.onMessage.addListener(handleBgMessage);
+	contentScript.bgPort.onDisconnect.addListener(() => {
 		console.error('bg port disconnected');
 	});
 	window.addEventListener('message', handleWebPageMessage, false);
@@ -64,11 +40,16 @@ function initListeners() {
 
 function handleWebPageMessage(evt) {
 	var msg = evt.data;
+	if (window !== evt.source) return;
+	if (!msg || !msg.type || !msg.meta || msg.meta.src !== WP_SRC) return;
 
-	if (!msg || !msg.type || !msg.meta || msg.meta.hash !== window.hash) return;
 	switch (msg.type) {
 		case 'init':
 			return sendInitToBg(msg);
+		case 'teardown':
+			return sendTearDownToBg(msg);
+		default:
+			return sendUnknownMsgToPage(msg);
 	}
 }
 
@@ -77,40 +58,91 @@ function handleBgMessage(msg) {
 	switch (msg.type) {
 		case 'init':
 			return handleInitFromBg(msg);
+		case 'teardown':
+			return handleTearDownFromBg(msg);
 	}
 }
 
 function sendInitToBg(msg) {
-	if (!msg.payload.config) {
+	if (!msg.payload || !msg.payload) {
 		console.error('No config provided');
-		return;
-	}
-	window.bgPort.postMessage(
-		fmtMessage(
+		sendToWindow(
 			{
-				payload: msg.payload.config
+				error: true,
+				payload: {
+					code: 'no_config',
+					message: `No config provided with init call`
+				}
 			},
 			msg
-		)
+		);
+		return;
+	}
+	sendToBg(
+		{
+			type: 'init',
+			payload: msg.payload
+		},
+		msg
 	);
 }
 
+function sendTearDownToBg(msg) {
+	sendToBg({ type: 'teardown' }, msg);
+}
+
+function handleTearDownFromBg(msg) {
+	let winMsg = {
+		payload: 'ok'
+	};
+	if (msg.error) {
+		winMsg.error = true;
+		winMsg.payload = {
+			code: 'teardown_error',
+			message: 'Failed to teardown LWS'
+		};
+	}
+}
+
+function sendUnknownMsgToPage(msg) {
+	sendToWindow(
+		{
+			error: true,
+			payload: {
+				code: 'unknown_type',
+				message: `Unknown message type ${msg.type}`
+			}
+		},
+		msg
+	);
+}
+
+function sendToBg(msg, req) {
+	contentScript.bgPort.postMessage(fmtMessage(msg, req));
+}
+
+function sendToWindow(msg, req) {
+	window.postMessage(fmtMessage(msg, req), window.location.href);
+}
+
 function handleInitFromBg(msg) {
-	console.log('connected: true');
+	let winMsg = {
+		payload: {
+			uiUrl: chrome.runtime.getURL('main.html')
+		}
+	};
+	if (msg.error) {
+		winMsg.error = true;
+		winMsg.payload = {
+			code: 'init_error',
+			message: 'Failed initializing LWS'
+		};
+	}
+	sendToWindow(winMsg, msg);
 }
 
 function main() {
-	var hash = generateHash();
-	window.hash = hash;
 	initListeners();
-	var data = {
-		clientUrl: chrome.runtime.getURL('lws-inject.js'),
-		clientTagId: 'lws-js-sdk',
-		iframeUrl: chrome.runtime.getURL('main.html'),
-		originHash: hash,
-		id: chrome.runtime.id
-	};
-	injectInitial(data);
 }
 
 main();
