@@ -23,15 +23,13 @@
   },
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "web_accessible_resources": [
-    "main.html",
-    "img/128x128.png",
-    "modal.html"
+	"img/128x128.png",
+	"app/index.html"
   ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "run_at": "document_start",
-      "css": ["lws.css"],
       "js": ["content.js"]
     }
   ],

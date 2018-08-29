@@ -15,6 +15,9 @@
   "homepage": "https://github.com/kyc-chain/selfkey-connect#readme",
   "dependencies": {},
   "scripts": {
+	"postinstall": "cd src/app && yarn && cd -",
+    "build": "yarn build:app && rm -rf build && mkdir -p  build/app && cp -r src/ext/* build && cp -r src/app/build/* build/app",
+    "build:app": "cd src/app && yarn build && cd -",
     "precommit": "pretty-quick --staged && lint-staged",
     "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check"
   },
@@ -27,6 +30,7 @@
   "devDependencies": {
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^4.17.0",
     "eslint-config-prettier": "^2.8.0",
     "eslint-config-standard": "^11.0.0-beta.0",
@@ -43,8 +47,7 @@
     "lint-staged": "^6.1.0",
     "mocha": "^4.0.1",
     "prettier": "^1.14.2",
-	"pretty-quick": "^1.6.0",
-	"cz-conventional-changelog": "^2.1.0"
+    "pretty-quick": "^1.6.0"
   },
   "engines": {
     "node": "9.5.0",

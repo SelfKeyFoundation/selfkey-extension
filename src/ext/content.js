@@ -128,7 +128,7 @@ function sendToWindow(msg, req) {
 function handleInitFromBg(msg) {
 	let winMsg = {
 		payload: {
-			uiUrl: chrome.runtime.getURL('main.html')
+			uiUrl: chrome.runtime.getURL('app/index.html')
 		}
 	};
 	if (msg.error) {

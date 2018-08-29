@@ -2,16 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './views/App';
-import registerServiceWorker from './registerServiceWorker';
 
+import { useBasename } from 'history';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { browserHistory, Router, Route } from 'react-router';
 
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from './state/store';
 
+let history = useBasename(() => browserHistory)({
+	basename: process.env.NODE_ENV === 'production' ? '/app/index.html' : ''
+});
 const reduxStore = configureStore(window.REDUX_INITIAL_DATA);
-const history = syncHistoryWithStore(browserHistory, reduxStore);
+history = syncHistoryWithStore(history, reduxStore);
 
 const RootHtml = () => (
 	<ReduxProvider store={reduxStore}>
@@ -22,4 +25,3 @@ const RootHtml = () => (
 );
 
 ReactDOM.render(<RootHtml />, document.getElementById('root'));
-registerServiceWorker();
