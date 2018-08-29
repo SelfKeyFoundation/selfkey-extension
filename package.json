@@ -13,9 +13,11 @@
     "url": "https://github.com/kyc-chain/selfkey-connect/issues"
   },
   "homepage": "https://github.com/kyc-chain/selfkey-connect#readme",
-  "dependencies": {},
+  "dependencies": {
+    "redux-thunk": "^2.3.0"
+  },
   "scripts": {
-	"postinstall": "cd src/app && yarn && cd -",
+    "postinstall": "cd src/app && yarn && cd -",
     "build": "yarn build:app && rm -rf build && mkdir -p  build/app && cp -r src/ext/* build && cp -r src/app/build/* build/app",
     "build:app": "cd src/app && yarn build && cd -",
     "precommit": "pretty-quick --staged && lint-staged",

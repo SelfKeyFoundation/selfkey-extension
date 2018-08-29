@@ -1,11 +1,8 @@
-import configureStore from './state/store';
 import { errorOperations } from './state/error';
-let port;
-
 export class LWSService {
-	constructor() {
-		this.port = port || (port = chrome.runtime.connect({ name: 'LWS_INIT' }));
-		this.store = configureStore();
+	constructor(store) {
+		this.port = chrome.runtime.connect({ name: 'LWS_INIT' });
+		this.store = store;
 		this.handleErrors();
 	}
 
@@ -16,4 +13,5 @@ export class LWSService {
 			}
 		});
 	}
+	start() {}
 }
