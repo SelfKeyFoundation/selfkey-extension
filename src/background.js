@@ -29,6 +29,7 @@ const fmtMessage = (msg, req) => {
 	if (!msg.type && msg.error) {
 		msg.type = 'error';
 	}
+	return msg;
 };
 
 const sendToWs = (msg, sendResponse) => {
@@ -36,12 +37,16 @@ const sendToWs = (msg, sendResponse) => {
 	bg.wsReqs[msgId] = { req: msg };
 	bg.wsReqs[msgId].handleRes = res => {
 		clearTimeout(bg.wsReqs.timeout);
-		sendResponse(fmtMessage(msg));
+		sendResponse(msg);
 		delete bg.wsReqs[msgId];
 	};
 	bg.wsReqs[msgId].timeout = setTimeout(() => {
-		bg.wsReqs[msgId].handleRes({ error: 'response timed out' });
+		bg.wsReqs[msgId].handleRes({
+			error: true,
+			payload: { code: 'response_timeout', message: 'Response timed out' }
+		});
 	}, WS_REQ_TIMEOUT);
+	bg.ws.send(JSON.stringify(msg));
 };
 
 const sendToAllPorts = msg => {
@@ -65,7 +70,8 @@ const handleWSClose = ctx => () => {
 	console.log('ws connection closed');
 	sendToAllPorts(
 		fmtMessage({
-			error: 'websocket disconnected'
+			error: true,
+			payload: { code: 'idw_disconnect', message: 'IDW disconnected' }
 		})
 	);
 	bg.ws = null;
@@ -92,41 +98,41 @@ const initWS = ctx => {
 };
 
 const handlePortMessage = ctx => (msg, port) => {
-	const sendResponse = msg => port.postMessage(msg);
+	const sendResponse = (msg, req) => port.postMessage(fmtMessage(msg, req));
 
 	if (!msg.type || !ALLOWED_REQUESTS.includes(msg.type)) {
 		sendResponse(
-			fmtMessage(
-				{
-					error: 'invalid request message'
-				},
-				msg
-			)
+			{
+				error: true,
+				payload: {
+					code: 'invalid_request',
+					message: `Invalid request ${msg.type}`
+				}
+			},
+			msg
 		);
 		return;
 	}
 
 	if (msg.type === 'init') {
+		console.log('init from content');
 		ctx.config = msg.config;
 		sendResponse(
-			fmtMessage(
-				{
-					type: 'init'
-				},
-				msg
-			)
+			{
+				payload: 'ok'
+			},
+			msg
 		);
 		return;
 	}
 
 	if (!bg.ws || bg.ws.readyState !== 1) {
 		sendResponse(
-			fmtMessage(
-				{
-					error: 'ws socket not open'
-				},
-				msg
-			)
+			{
+				error: true,
+				payload: { code: 'idw_no_connection', message: 'No connection to IDW' }
+			},
+			msg
 		);
 		return;
 	}
@@ -140,7 +146,7 @@ const handlePortMessage = ctx => (msg, port) => {
 };
 
 const handleConnection = port => {
-	console.assert(port.port.name === PORT_NAME);
+	console.assert(port.name === PORT_NAME);
 	console.log('port connected');
 	bg.ports.push(port);
 	const ctx = {
@@ -148,7 +154,7 @@ const handleConnection = port => {
 		ws: bg.ws
 	};
 	port.onMessage.addListener(handlePortMessage(ctx));
-	port.onDisconnect(port => {
+	port.onDisconnect.addListener(port => {
 		console.log('port disconnected');
 		let idx = bg.ports.indexOf(port);
 		if (idx < 0) return;
