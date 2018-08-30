@@ -9,20 +9,19 @@ import AuthSuccessContainer from './views/containers/AuthSuccessContainer';
 import ErrorNoIdContainer from './views/containers/ErrorNoIdContainer';
 import ErrorNoIDWContainer from './views/containers/ErrorNoIDWContainer';
 
-import { syncHistoryWithStore } from 'react-router-redux';
-import { hashHistory, Router, Route, IndexRoute } from 'react-router';
+import { Router, Route } from 'react-router';
 
 import { Provider as ReduxProvider } from 'react-redux';
-import configureStore from './state/store';
+import { setGlobalContext, configureContext } from './context';
 
-const reduxStore = configureStore(window.REDUX_INITIAL_DATA);
-const reduxHistory = syncHistoryWithStore(hashHistory, reduxStore);
+const ctx = configureContext(window.REDUX_INITIAL_DATA).cradle;
+setGlobalContext(ctx);
 
 const RootHtml = () => (
-	<ReduxProvider store={reduxStore}>
-		<Router history={reduxHistory}>
-			<Route path="/" component={App}>
-				<IndexRoute component={WalletsContainer} />
+	<ReduxProvider store={ctx.store}>
+		<Router history={ctx.reduxHistory}>
+			<Route path="/:hash/" component={App}>
+				<Route path="/wallets" component={WalletsContainer} />
 				<Route path="/error/no-id" component={ErrorNoIdContainer} />
 				<Route path="/error/no-idw" component={ErrorNoIDWContainer} />
 				<Route path="/auth/attributes" component={AttributesContainer} />

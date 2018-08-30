@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
 import './App.css';
+import { connect } from 'react-redux';
+import { appOperations } from '../state/app';
 
 class App extends Component {
-	componentDidMount() {}
+	async componentDidMount() {
+		const { dispatch } = this.props;
+		await dispatch(appOperations.initApp(this.props.params.hash));
+	}
 	componentWillUnmount() {}
 	render() {
 		const { children } = this.props;
+		if (this.props.loading) {
+			return <div>Loading</div>;
+		}
 		return <div>{children}</div>;
 	}
 }
 
-export default App;
+const connectedApp = connect()(App);
+
+export default connectedApp;

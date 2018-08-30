@@ -1,6 +1,6 @@
 import reducer from './reducers';
 
-import * as appOperations from './operations';
+import appOperations from './operations';
 import * as appSelectors from './selectors';
 import * as appTypes from './types';
 

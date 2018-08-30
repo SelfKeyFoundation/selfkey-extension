@@ -1,17 +1,18 @@
+/* global chrome */
 const MSG_SRC = 'lws_app';
 const BG_MSG_SRC = 'lws_background';
 const PORT_NAME = 'LWS_APP';
 const BG_REQ_TIMEOUT = 5000;
 export class LWSService {
-	constructor(store, website) {
+	constructor({ store }) {
 		this.port = null;
 		this.store = store;
 		this.msgId = 0;
 		this.reqs = {};
 	}
 
-	async connectToBg() {
-		this.port = chrome.runtime.connect({ name: PORT_NAME });
+	async connect(hash) {
+		this.port = chrome.runtime.connect({ name: `${PORT_NAME}#{hash}` });
 		this.port.onMessage.addListener(msg => {
 			if (!msg || !msg.type || !msg.meta || msg.meta.src !== BG_MSG_SRC) return;
 			if (msg.meta.id && this.reqs[msg.meta.id]) {
@@ -23,7 +24,7 @@ export class LWSService {
 		return this.config;
 	}
 
-	disconnectPort() {
+	disconnect() {
 		if (!this.port) return;
 
 		this.port.disconnect();
@@ -116,3 +117,5 @@ export class LWSService {
 
 	start() {}
 }
+
+export default LWSService;
