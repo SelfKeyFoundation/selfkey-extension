@@ -1,6 +1,6 @@
 'use strict';
 /* globals chrome */
-var LWS_CONTENT_SCRIPT_NAME = 'LWS_INIT';
+var PORT_NAME = 'LWS_CONTENT';
 
 const MSG_SRC = 'lws_content';
 const WP_SRC = 'lws_client';
@@ -30,7 +30,7 @@ const fmtMessage = (msg, req) => {
 };
 
 function initListeners() {
-	contentScript.bgPort = chrome.runtime.connect({ name: LWS_CONTENT_SCRIPT_NAME });
+	contentScript.bgPort = chrome.runtime.connect({ name: PORT_NAME });
 	contentScript.bgPort.onMessage.addListener(handleBgMessage);
 	contentScript.bgPort.onDisconnect.addListener(() => {
 		console.error('bg port disconnected');
@@ -44,9 +44,9 @@ function handleWebPageMessage(evt) {
 	if (!msg || !msg.type || !msg.meta || msg.meta.src !== WP_SRC) return;
 
 	switch (msg.type) {
-		case 'init':
+		case 'wp_init':
 			return sendInitToBg(msg);
-		case 'teardown':
+		case 'wp_teardown':
 			return sendTearDownToBg(msg);
 		default:
 			return sendUnknownMsgToPage(msg);
@@ -88,7 +88,7 @@ function sendInitToBg(msg) {
 }
 
 function sendTearDownToBg(msg) {
-	sendToBg({ type: 'teardown' }, msg);
+	sendToBg({ type: 'wp_teardown' }, msg);
 }
 
 function handleTearDownFromBg(msg) {
@@ -128,7 +128,8 @@ function sendToWindow(msg, req) {
 function handleInitFromBg(msg) {
 	let winMsg = {
 		payload: {
-			uiUrl: chrome.runtime.getURL('app/index.html')
+			uiUrl: chrome.runtime.getURL('app/index.html') + '#/init/' + msg.payload,
+			hash: msg.payload
 		}
 	};
 	if (msg.error) {

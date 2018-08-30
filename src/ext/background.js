@@ -1,7 +1,8 @@
 'use strict';
 
 const WS_URL = 'ws://localhost:8898';
-const PORT_NAME = 'LWS_INIT';
+const CONTENT_PORT_NAME = 'LWS_CONTENT';
+const APP_PORT_NAME = 'LWS_APP_PORT';
 const ALLOWED_REQUESTS = ['init', 'wallets', 'unlock', 'attributes', 'auth'];
 const MSG_SRC = 'lws_bg';
 const WS_REQ_TIMEOUT = 5000;
@@ -97,6 +98,11 @@ const initWS = ctx => {
 	ws.addEventListener('error', handleWSError(ctx));
 };
 
+const genConnHash = () => {
+	// TODO: make this secure
+	return Math.random();
+};
+
 const handlePortMessage = ctx => (msg, port) => {
 	const sendResponse = (msg, req) => port.postMessage(fmtMessage(msg, req));
 
@@ -114,23 +120,30 @@ const handlePortMessage = ctx => (msg, port) => {
 		return;
 	}
 
-	if (msg.type === 'init') {
+	if (msg.type === 'wp_init') {
 		console.log('init from content');
 		ctx.config = msg.config;
 		sendResponse(
 			{
-				payload: 'ok'
+				payload: genConnHash()
 			},
 			msg
 		);
 		return;
 	}
 
+	if (msg.type === 'app_init') {
+		return sendResponse({
+			payload: ctx.config,
+			msg
+		});
+	}
+
 	if (!bg.ws || bg.ws.readyState !== 1) {
 		sendResponse(
 			{
 				error: true,
-				payload: { code: 'idw_no_connection', message: 'No connection to IDW' }
+				payload: { code: 'idw_no_conne', message: 'No connection to IDW' }
 			},
 			msg
 		);
@@ -139,26 +152,51 @@ const handlePortMessage = ctx => (msg, port) => {
 
 	let wsMessage = fmtMessage({}, msg);
 
-	if (msg.type === 'attributes') {
-		wsMessage.payload.required = ctx.config.required;
-	}
 	sendToWs(wsMessage, ctx, sendResponse);
 };
 
+const genConnContext = port => {
+	let ctx = null;
+	if (port.name === CONTENT_PORT_NAME) {
+		let hash = genConnHash();
+		ctx = {
+			port,
+			ws: bg.ws,
+			hash
+		};
+		bg.conns[hash] = ctx;
+	}
+
+	if (port.name.startsWith(APP_PORT_NAME)) {
+		let portInfo = port.name.split('#');
+		ctx = bg.conns[portInfo[1]];
+		ctx.appPorts = ctx.appPorts || [];
+		ctx.appPorts.push(port);
+	}
+
+	return ctx;
+};
+
 const handleConnection = port => {
-	console.assert(port.name === PORT_NAME);
+	console.assert(port.name === CONTENT_PORT_NAME || port.name.startsWith(APP_PORT_NAME));
+
 	console.log('port connected');
 	bg.ports.push(port);
-	const ctx = {
-		port: port,
-		ws: bg.ws
-	};
+	const ctx = genConnContext(port);
+	if (!ctx) throw new Error('invlid connection');
+
 	port.onMessage.addListener(handlePortMessage(ctx));
 	port.onDisconnect.addListener(port => {
 		console.log('port disconnected');
 		let idx = bg.ports.indexOf(port);
 		if (idx < 0) return;
 		bg.ports.splice(idx, 1);
+		if (port.name === CONTENT_PORT_NAME) {
+			(ctx.appPorts || []).forEach(p => {
+				port.disconnect();
+			});
+			delete bg.conns[ctx.hash];
+		}
 	});
 };
 
