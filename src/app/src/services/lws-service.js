@@ -1,6 +1,5 @@
 /* global chrome */
 const MSG_SRC = 'lws_app';
-const BG_MSG_SRC = 'lws_background';
 const PORT_NAME = 'LWS_APP';
 const BG_REQ_TIMEOUT = 5000;
 export class LWSService {
@@ -12,9 +11,10 @@ export class LWSService {
 	}
 
 	async connect(hash) {
-		this.port = chrome.runtime.connect({ name: `${PORT_NAME}#{hash}` });
+		this.port = chrome.runtime.connect({ name: `${PORT_NAME}#${hash}` });
 		this.port.onMessage.addListener(msg => {
-			if (!msg || !msg.type || !msg.meta || msg.meta.src !== BG_MSG_SRC) return;
+			console.log('app: msg from bg', msg);
+			if (!msg || !msg.type || !msg.meta) return;
 			if (msg.meta.id && this.reqs[msg.meta.id]) {
 				return this.reqs[msg.meta.id].handleRes(msg);
 			}
@@ -75,6 +75,7 @@ export class LWSService {
 			var msgId = msg.meta.id;
 			this.reqs[msgId] = { req: msg };
 			this.reqs[msgId].handleRes = res => {
+				console.log('app: response for', msg.type, res);
 				clearTimeout(this.reqs[msgId].timeout);
 				delete this.reqs[msgId];
 				if (res.error) {
@@ -82,8 +83,10 @@ export class LWSService {
 				}
 				resolve(res);
 			};
+			console.log('app: sending request to bg', msg);
+			this.port.postMessage(msg);
 			this.reqs[msgId].timeout = setTimeout(() => {
-				console.error('request timeout for', msg.type);
+				console.error('app: request timeout for', msg);
 				this.reqs[msgId].handleRes({
 					error: true,
 					payload: {

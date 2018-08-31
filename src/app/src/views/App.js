@@ -2,22 +2,31 @@ import React, { Component } from 'react';
 import './App.css';
 import { connect } from 'react-redux';
 import { appOperations } from '../state/app';
-
+import { getAppLoading, getAppError } from '../state/app/selectors';
 class App extends Component {
-	async componentDidMount() {
+	componentDidMount() {
 		const { dispatch } = this.props;
-		await dispatch(appOperations.initApp(this.props.params.hash));
+		dispatch(appOperations.initApp(this.props.params.hash));
 	}
-	componentWillUnmount() {}
+	componentWillUnmount() {
+		const { dispatch } = this.props;
+		dispatch(appOperations.destroyApp());
+	}
 	render() {
-		const { children } = this.props;
-		if (this.props.loading) {
-			return <div>Loading</div>;
+		const { children, loading, error } = this.props;
+		if (loading) {
+			return <h1>Loading</h1>;
+		}
+		if (error) {
+			return <h1>Error: {error.message}</h1>;
 		}
 		return <div>{children}</div>;
 	}
 }
 
-const connectedApp = connect()(App);
+const connectedApp = connect(state => ({
+	loading: getAppLoading(state),
+	error: getAppError(state)
+}))(App);
 
 export default connectedApp;

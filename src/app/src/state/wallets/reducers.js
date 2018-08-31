@@ -2,21 +2,13 @@ import * as types from './types';
 
 const initialState = {
 	list: [],
-	byId: {}
+	byId: {},
+	error: null
 };
 
 const walletsUpdateReducer = (state, { error, payload }) => {
 	if (error) {
 		return { ...state, error: payload };
-	}
-	if (!payload || !payload.length) {
-		return {
-			...state,
-			error: {
-				code: 'no_id',
-				message: 'No SelfKey ID'
-			}
-		};
 	}
 	let walletsState = (payload || []).reduce((acc, w) => {
 		acc.list.push(w.wid);

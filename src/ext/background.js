@@ -2,8 +2,8 @@
 
 const WS_URL = 'ws://localhost:8898';
 const CONTENT_PORT_NAME = 'LWS_CONTENT';
-const APP_PORT_NAME = 'LWS_APP_PORT';
-const ALLOWED_REQUESTS = ['init', 'wallets', 'unlock', 'attributes', 'auth'];
+const APP_PORT_NAME = 'LWS_APP';
+const ALLOWED_REQUESTS = ['wp_init', 'app_init', 'wallets', 'unlock', 'attributes', 'auth'];
 const MSG_SRC = 'lws_bg';
 const WS_REQ_TIMEOUT = 5000;
 const WS_RECONNECT_INTERVAL = 5000;
@@ -12,7 +12,8 @@ const bg = {
 	msgId: 0,
 	ports: [],
 	ws: null,
-	wsReqs: {}
+	wsReqs: {},
+	conns: {}
 };
 
 // TODO: handle ws disconnects and reconnects
@@ -33,15 +34,16 @@ const fmtMessage = (msg, req) => {
 	return msg;
 };
 
-const sendToWs = (msg, sendResponse) => {
+const sendToWs = (msg, ctx, sendResponse) => {
 	const msgId = msg.meta.id;
 	bg.wsReqs[msgId] = { req: msg };
 	bg.wsReqs[msgId].handleRes = res => {
-		clearTimeout(bg.wsReqs.timeout);
-		sendResponse(msg);
+		clearTimeout(bg.wsReqs[msgId].timeout);
+		sendResponse(res, msg);
 		delete bg.wsReqs[msgId];
 	};
 	bg.wsReqs[msgId].timeout = setTimeout(() => {
+		if (!bg.wsReqs[msgId]) return;
 		bg.wsReqs[msgId].handleRes({
 			error: true,
 			payload: { code: 'response_timeout', message: 'Response timed out' }
@@ -105,7 +107,7 @@ const genConnHash = () => {
 
 const handlePortMessage = ctx => (msg, port) => {
 	const sendResponse = (msg, req) => port.postMessage(fmtMessage(msg, req));
-
+	console.log(port.name, msg);
 	if (!msg.type || !ALLOWED_REQUESTS.includes(msg.type)) {
 		sendResponse(
 			{
@@ -121,29 +123,20 @@ const handlePortMessage = ctx => (msg, port) => {
 	}
 
 	if (msg.type === 'wp_init') {
-		console.log('init from content');
-		ctx.config = msg.config;
-		sendResponse(
-			{
-				payload: genConnHash()
-			},
-			msg
-		);
-		return;
+		ctx.config = msg.payload;
+		return sendResponse({ payload: ctx.hash }, msg);
 	}
 
 	if (msg.type === 'app_init') {
-		return sendResponse({
-			payload: ctx.config,
-			msg
-		});
+		console.log('init from app', ctx);
+		return sendResponse({ payload: ctx.config }, msg);
 	}
 
-	if (!bg.ws || bg.ws.readyState !== 1) {
+	if (!bg.ws) {
 		sendResponse(
 			{
 				error: true,
-				payload: { code: 'idw_no_conne', message: 'No connection to IDW' }
+				payload: { code: 'idw_no_conn', message: 'No connection to IDW' }
 			},
 			msg
 		);
@@ -161,7 +154,6 @@ const genConnContext = port => {
 		let hash = genConnHash();
 		ctx = {
 			port,
-			ws: bg.ws,
 			hash
 		};
 		bg.conns[hash] = ctx;
@@ -170,6 +162,7 @@ const genConnContext = port => {
 	if (port.name.startsWith(APP_PORT_NAME)) {
 		let portInfo = port.name.split('#');
 		ctx = bg.conns[portInfo[1]];
+		if (!ctx) return null;
 		ctx.appPorts = ctx.appPorts || [];
 		ctx.appPorts.push(port);
 	}
@@ -180,14 +173,14 @@ const genConnContext = port => {
 const handleConnection = port => {
 	console.assert(port.name === CONTENT_PORT_NAME || port.name.startsWith(APP_PORT_NAME));
 
-	console.log('port connected');
+	console.log('port connected', port.name);
 	bg.ports.push(port);
 	const ctx = genConnContext(port);
 	if (!ctx) throw new Error('invlid connection');
 
 	port.onMessage.addListener(handlePortMessage(ctx));
 	port.onDisconnect.addListener(port => {
-		console.log('port disconnected');
+		console.log('port disconnected', port.name);
 		let idx = bg.ports.indexOf(port);
 		if (idx < 0) return;
 		bg.ports.splice(idx, 1);
@@ -201,7 +194,7 @@ const handleConnection = port => {
 };
 
 const main = () => {
-	bg.ws = initWS();
+	initWS();
 	chrome.runtime.onConnect.addListener(handleConnection);
 };
 

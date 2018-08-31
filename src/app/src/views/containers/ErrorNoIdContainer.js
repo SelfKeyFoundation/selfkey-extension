@@ -4,10 +4,11 @@ import { Link } from 'react-router';
 
 class ErrorNoIdContainer extends Component {
 	render() {
+		const retryUrl = `/${this.props.params.hash}/wallets`;
 		return (
 			<div>
 				Error! No id
-				<Link to="/">Retry</Link>
+				<Link to={retryUrl}>Retry</Link>
 			</div>
 		);
 	}

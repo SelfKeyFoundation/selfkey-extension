@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 
 class ErrorNoIDWContainer extends Component {
 	render() {
+		const retryUrl = `/${this.props.params.hash}/wallets`;
 		return (
 			<div>
 				Error! No Identity wallet
@@ -14,7 +15,7 @@ class ErrorNoIDWContainer extends Component {
 				>
 					Download Idwntity Wallet
 				</a>
-				<Link to="/">Retry</Link>
+				<Link to={retryUrl}>Retry</Link>
 			</div>
 		);
 	}

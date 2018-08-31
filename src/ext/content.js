@@ -56,9 +56,9 @@ function handleWebPageMessage(evt) {
 function handleBgMessage(msg) {
 	if (!msg.type) return;
 	switch (msg.type) {
-		case 'init':
+		case 'wp_init':
 			return handleInitFromBg(msg);
-		case 'teardown':
+		case 'wp_teardown':
 			return handleTearDownFromBg(msg);
 	}
 }
@@ -80,7 +80,7 @@ function sendInitToBg(msg) {
 	}
 	sendToBg(
 		{
-			type: 'init',
+			type: 'wp_init',
 			payload: msg.payload
 		},
 		msg
@@ -126,9 +126,10 @@ function sendToWindow(msg, req) {
 }
 
 function handleInitFromBg(msg) {
+	console.log('init from bg', msg);
 	let winMsg = {
 		payload: {
-			uiUrl: chrome.runtime.getURL('app/index.html') + '#/init/' + msg.payload,
+			uiUrl: chrome.runtime.getURL('app/index.html') + '#/' + msg.payload + '/',
 			hash: msg.payload
 		}
 	};

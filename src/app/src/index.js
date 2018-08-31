@@ -20,13 +20,13 @@ setGlobalContext(ctx);
 const RootHtml = () => (
 	<ReduxProvider store={ctx.store}>
 		<Router history={ctx.reduxHistory}>
-			<Route path="/:hash/" component={App}>
-				<Route path="/wallets" component={WalletsContainer} />
-				<Route path="/error/no-id" component={ErrorNoIdContainer} />
-				<Route path="/error/no-idw" component={ErrorNoIDWContainer} />
-				<Route path="/auth/attributes" component={AttributesContainer} />
-				<Route path="/auth/success" component={AuthSuccessContainer} />
-				<Route path="/auth/failed" component={AuthFailedContainer} />
+			<Route path="/:hash" component={App}>
+				<Route path="wallets" component={WalletsContainer} />
+				<Route path="error/no-id" component={ErrorNoIdContainer} />
+				<Route path="error/no-idw" component={ErrorNoIDWContainer} />
+				<Route path="auth/attributes" component={AttributesContainer} />
+				<Route path="auth/success" component={AuthSuccessContainer} />
+				<Route path="auth/failed" component={AuthFailedContainer} />
 			</Route>
 		</Router>
 	</ReduxProvider>

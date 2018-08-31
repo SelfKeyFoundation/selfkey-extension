@@ -11,7 +11,7 @@ const appReducer = (state = initialState, action) => {
 		case types.APP_LOADING_SET:
 			return { ...state, loading: action.payload };
 		case types.APP_CONFIG_SET:
-			return { ...state, config: action.payload };
+			return { ...state, config: action.payload || null };
 		case types.APP_ERROR_SET:
 			return { ...state, error: action.payload };
 		default:
