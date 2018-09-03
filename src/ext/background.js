@@ -143,8 +143,7 @@ const handlePortMessage = ctx => (msg, port) => {
 		return;
 	}
 
-	let wsMessage = fmtMessage({}, msg);
-
+	let wsMessage = fmtMessage({ payload: msg.payload }, msg);
 	sendToWs(wsMessage, ctx, sendResponse);
 };
 

@@ -50,10 +50,11 @@ export class LWSService {
 		});
 	}
 
-	unlock(publicKey, password) {
+	unlock(website, publicKey, password) {
+		console.log('app: unlock', publicKey, password);
 		return this.sendRequest({
 			type: 'unlock',
-			payload: { publicKey, password }
+			payload: { website, publicKey, password }
 		});
 	}
 
