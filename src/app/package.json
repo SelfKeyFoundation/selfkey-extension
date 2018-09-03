@@ -12,10 +12,10 @@
     "react-scripts": "1.1.4",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
-    "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#feat/lws"
+    "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#d709d89afc559054879d45fb738da4d880bc036b"
   },
   "devDependencies": {
-	"eslint": "^4.17.0",
+    "eslint": "^4.17.0",
     "eslint-config-prettier": "^2.8.0",
     "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-plugin-import": "^2.8.0",
@@ -31,6 +31,6 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-	"eject": "react-scripts eject"
+    "eject": "react-scripts eject"
   }
 }
