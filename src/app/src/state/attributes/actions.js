@@ -1,8 +1,14 @@
 import * as types from './types';
 
-const updateAttributes = attributes => ({
+const updateAttributes = (attributes, error) => ({
 	type: types.ATTRIBUTES_UPDATE,
-	payload: attributes
+	payload: attributes,
+	error
 });
 
-export { updateAttributes };
+const setAttributesLoading = loading => ({
+	type: types.ATTRIBUTES_SET_LOADING,
+	payload: loading
+});
+
+export { updateAttributes, setAttributesLoading };

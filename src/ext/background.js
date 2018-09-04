@@ -36,7 +36,7 @@ const fmtMessage = (msg, req) => {
 
 const sendToWs = (msg, ctx, sendResponse) => {
 	const msgId = msg.meta.id;
-	bg.wsReqs[msgId] = { req: msg };
+	bg.wsReqs[msgId] = { req: msg, ctx };
 	bg.wsReqs[msgId].handleRes = res => {
 		clearTimeout(bg.wsReqs[msgId].timeout);
 		sendResponse(res, msg);
@@ -63,10 +63,13 @@ const handleWSMessage = ctx => evt => {
 	let id = (msg.meta || {}).id;
 	let req = bg.wsReqs[id];
 	if (!req) {
-		console.log('unknown message');
+		console.log('unknown message', msg);
 		return;
 	}
 	req.handleRes(msg);
+	if (msg.type === 'auth' && req.ctx.port) {
+		req.ctx.port.postMessage(fmtMessage({ type: 'wp_auth', payload: msg.payload }, msg));
+	}
 };
 
 const handleWSClose = ctx => () => {
@@ -132,7 +135,7 @@ const handlePortMessage = ctx => (msg, port) => {
 		return sendResponse({ payload: ctx.config }, msg);
 	}
 
-	if (!bg.ws) {
+	if (!bg.ws || bg.ws.readyState !== 1) {
 		sendResponse(
 			{
 				error: true,

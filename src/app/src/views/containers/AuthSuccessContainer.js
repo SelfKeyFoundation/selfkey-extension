@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { LWSSuccess } from 'selfkey-ui';
 
 class AuthSuccessContainer extends Component {
 	render() {
-		return <div>Auth Success</div>;
+		return <LWSSuccess />;
 	}
 }
 

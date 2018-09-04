@@ -11,6 +11,7 @@ class AuthFailedContainer extends Component {
 		this.props.dispatch(push(`${config.hash}/wallets`));
 	};
 	render() {
+		console.log('auth error render');
 		return <LWSAuthError website={this.props.config.website} retryAction={this.handleRetry} />;
 	}
 }

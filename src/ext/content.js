@@ -60,6 +60,8 @@ function handleBgMessage(msg) {
 			return handleInitFromBg(msg);
 		case 'wp_teardown':
 			return handleTearDownFromBg(msg);
+		case 'wp_auth':
+			return handleAuthFromBg(msg);
 	}
 }
 
@@ -115,6 +117,10 @@ function sendUnknownMsgToPage(msg) {
 		},
 		msg
 	);
+}
+
+function handleAuthFromBg(msg) {
+	sendToWindow({ payload: msg.payload, error: msg.error }, msg);
 }
 
 function sendToBg(msg, req) {

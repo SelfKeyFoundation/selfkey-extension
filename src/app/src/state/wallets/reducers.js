@@ -37,6 +37,7 @@ const walletsReducer = (state = initialState, action) => {
 		case types.WALLETS_UPDATE:
 			return walletsUpdateReducer(state, action);
 		case types.WALLETS_SELECT:
+			console.log(action);
 			return { ...state, selected: action.payload };
 		case types.WALLETS_UPDATE_ONE:
 			return walletsUpdateOneReducer(state, action);

@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
-
+import { push } from 'react-router-redux';
+import { LWSSelfkeyIdError } from 'selfkey-ui';
 class ErrorNoIdContainer extends Component {
-	render() {
+	retryAction = evt => {
+		evt.preventDefault();
 		const retryUrl = `/${this.props.params.hash}/wallets`;
-		return (
-			<div>
-				Error! No id
-				<Link to={retryUrl}>Retry</Link>
-			</div>
-		);
+		this.props.dispatch(push(retryUrl));
+	};
+	render() {
+		return <LWSSelfkeyIdError retryAction={this.retryAction} />;
 	}
 }
 

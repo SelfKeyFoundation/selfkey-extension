@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { connect } from 'react-redux';
 import { appOperations } from '../state/app';
+import { LWSLoading } from 'selfkey-ui';
 import { getAppLoading, getAppError } from '../state/app/selectors';
 class App extends Component {
 	componentDidMount() {
@@ -15,7 +16,7 @@ class App extends Component {
 	render() {
 		const { children, loading, error } = this.props;
 		if (loading) {
-			return <h1>Loading</h1>;
+			return <LWSLoading />;
 		}
 		if (error) {
 			return <h1>Error: {error.message}</h1>;

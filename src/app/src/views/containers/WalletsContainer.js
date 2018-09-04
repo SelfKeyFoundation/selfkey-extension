@@ -1,25 +1,36 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { walletsOperations, walletsSelectors } from '../../state/wallets';
-import { LWSSelectWallet } from 'selfkey-ui';
+import { LWSSelectWallet, LWSLoading } from 'selfkey-ui';
 
 class WalletsContainer extends Component {
 	componentDidMount() {
 		const { dispatch } = this.props;
-		dispatch(walletsOperations.loadWallets());
+		if (!this.props.wallets || !this.props.wallets.length) {
+			dispatch(walletsOperations.loadWallets());
+		}
 	}
-	handleLogin = (publicKey, password) => {
-		this.props.dispatch(walletsOperations.unlockWallet(publicKey, password));
+	handleLogin = (wallet, password) => {
+		this.props.dispatch(walletsOperations.unlockWallet(wallet.publicKey, password));
 	};
 	render() {
-		const { wallets } = this.props;
-		return <LWSSelectWallet wallets={wallets} loginAction={this.handleLogin} />;
+		const { wallets, error } = this.props;
+		if (!wallets || !wallets.length) {
+			return <LWSLoading />;
+		}
+		return (
+			<LWSSelectWallet
+				wallets={wallets}
+				loginAction={this.handleLogin}
+				passwordError={!!error}
+			/>
+		);
 	}
 }
 
 const ConnectedWalletsContainer = connect(state => ({
 	wallets: walletsSelectors.getWallets(state),
-	selectedWallet: walletsSelectors.getSelected(state)
+	error: walletsSelectors.getError(state)
 }))(WalletsContainer);
 
 export default ConnectedWalletsContainer;
