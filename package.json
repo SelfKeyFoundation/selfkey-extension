@@ -1,67 +1,70 @@
 {
-  "name": "selfkey-connect",
-  "version": "0.1.0",
-  "description": "SelfKey Connect Browser Extension",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kyc-chain/selfkey-connect.git"
-  },
-  "author": "Ben Gervais <ben@selfkey.org>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/kyc-chain/selfkey-connect/issues"
-  },
-  "homepage": "https://github.com/kyc-chain/selfkey-connect#readme",
-  "dependencies": {
-    "awilix": "^3.0.9",
-    "redux-thunk": "^2.3.0"
-  },
-  "scripts": {
-    "postinstall": "cd src/app && yarn && cd -",
-	"build": "yarn clean && yarn build:app  && yarn build:ext && yarn build:zip",
-	"clean": "rm -rf dist && rm -rf src/app/build",
-	"build:zip": "cd dist/lws-ext && zip -r ../lws-ext.zip ./* && cd -",
-	"build:ext": "mkdir -p  dist/lws-ext && cp -r src/ext/* dist/lws-ext",
-    "build:app": "cd src/app && yarn build && cd - && mkdir -p  dist/lws-ext/app && cp -r src/app/build/* dist/lws-ext/app ",
-    "precommit": "pretty-quick --staged && lint-staged",
-    "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check"
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
-  "devDependencies": {
-    "babel-eslint": "^8.2.6",
-    "chai": "^4.1.2",
-    "cz-conventional-changelog": "^2.1.0",
-    "eslint": "^4.17.0",
-    "eslint-config-prettier": "^2.8.0",
-    "eslint-config-standard": "^11.0.0-beta.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-jest": "^21.21.0",
-    "eslint-plugin-mocha": "^4.11.0",
-    "eslint-plugin-node": "^6.0.0",
-    "eslint-plugin-prettier": "^2.3.1",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-react": "^7.11.1",
-    "eslint-plugin-standard": "^3.0.1",
-    "husky": "^0.14.3",
-    "jest": "^23.5.0",
-    "lint-staged": "^6.1.0",
-    "mocha": "^4.0.1",
-    "prettier": "^1.14.2",
-    "pretty-quick": "^1.6.0"
-  },
-  "engines": {
-    "node": "9.5.0",
-    "npm": "5.6.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+    "name": "selfkey-connect",
+    "version": "1.0.0-beta.0",
+    "description": "SelfKey Connect Browser Extension",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kyc-chain/selfkey-connect.git"
+    },
+    "author": "Ben Gervais <ben@selfkey.org>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/kyc-chain/selfkey-connect/issues"
+    },
+    "homepage": "https://github.com/kyc-chain/selfkey-connect#readme",
+    "dependencies": {
+        "awilix": "^3.0.9",
+        "redux-thunk": "^2.3.0"
+    },
+    "scripts": {
+        "postinstall": "cd src/app && yarn && cd -",
+        "build": "yarn clean && yarn build:app  && yarn build:ext && yarn build:zip",
+        "clean": "rm -rf dist && rm -rf src/app/build",
+        "build:zip": "cd dist/lws-ext && zip -r ../lws-ext-${npm_package_version}.zip ./* && cd -",
+        "build:ext": "mkdir -p  dist/lws-ext && cp -r src/ext/* dist/lws-ext",
+        "build:app": "cd src/app && yarn build && cd - && mkdir -p  dist/lws-ext/app && cp -r src/app/build/* dist/lws-ext/app ",
+        "precommit": "pretty-quick --staged && lint-staged",
+        "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check",
+        "bump-version": "./scripts/bump-version.js"
+    },
+    "lint-staged": {
+        "*.js": [
+            "eslint --fix",
+            "git add"
+        ]
+    },
+    "devDependencies": {
+        "babel-eslint": "^8.2.6",
+        "chai": "^4.1.2",
+        "cz-conventional-changelog": "^2.1.0",
+        "eslint": "^4.17.0",
+        "eslint-config-prettier": "^2.8.0",
+        "eslint-config-standard": "^11.0.0-beta.0",
+        "eslint-plugin-import": "^2.8.0",
+        "eslint-plugin-jest": "^21.21.0",
+        "eslint-plugin-mocha": "^4.11.0",
+        "eslint-plugin-node": "^6.0.0",
+        "eslint-plugin-prettier": "^2.3.1",
+        "eslint-plugin-promise": "^3.6.0",
+        "eslint-plugin-react": "^7.11.1",
+        "eslint-plugin-standard": "^3.0.1",
+        "husky": "^0.14.3",
+        "jest": "^23.5.0",
+        "lint-staged": "^6.1.0",
+        "mocha": "^4.0.1",
+        "prettier": "^1.14.2",
+        "pretty-quick": "^1.6.0",
+        "semver": "^5.5.1",
+        "yargs": "^12.0.1"
+    },
+    "engines": {
+        "node": "9.5.0",
+        "npm": "5.6.0"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
     }
-  }
 }
