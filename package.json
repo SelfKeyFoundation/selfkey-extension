@@ -19,8 +19,11 @@
   },
   "scripts": {
     "postinstall": "cd src/app && yarn && cd -",
-    "build": "yarn build:app && rm -rf build && mkdir -p  build/app && cp -r src/ext/* build && cp -r src/app/build/* build/app",
-    "build:app": "cd src/app && yarn build && cd -",
+	"build": "yarn clean && yarn build:app  && yarn build:ext && yarn build:zip",
+	"clean": "rm -rf dist && rm -rf src/app/build",
+	"build:zip": "cd dist/lws-ext && zip -r ../lws-ext.zip ./* && cd -",
+	"build:ext": "mkdir -p  dist/lws-ext && cp -r src/ext/* dist/lws-ext",
+    "build:app": "cd src/app && yarn build && cd - && mkdir -p  dist/lws-ext/app && cp -r src/app/build/* dist/lws-ext/app ",
     "precommit": "pretty-quick --staged && lint-staged",
     "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check"
   },
