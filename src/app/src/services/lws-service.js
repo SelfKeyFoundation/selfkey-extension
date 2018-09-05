@@ -58,12 +58,11 @@ export class LWSService {
 		});
 	}
 
-	sendAuth(website, apiUrl, publicKey, attributes) {
+	sendAuth(website, publicKey, attributes) {
 		return this.sendRequest({
 			type: 'auth',
 			payload: {
 				website,
-				apiUrl,
 				publicKey,
 				attributes
 			}
