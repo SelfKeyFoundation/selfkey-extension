@@ -42,9 +42,7 @@ function incManifestVersion(newPkgVer, ver, command) {
 		while (parts.length < 3) parts.push(0);
 	}
 	let manifestSV = semver.coerce(ver);
-	console.log(manifestSV);
 	let pkgSV = semver(newPkgVer);
-	console.log(pkgSV);
 	if (semver.eq(manifestSV, pkgSV) || semver.gt(manifestSV, pkgSV)) {
 		return `${pkgSV.major}.${pkgSV.minor}.${pkgSV.patch}.${parts[3] + 1}`;
 	}
