@@ -36,17 +36,19 @@ function incPkgVersion(ver, command, preid) {
 	return semver.inc(ver, command, preid);
 }
 
-function incManifestVersion(ver, command) {
-	let parts = ver.split('.').map(p => +p);
+function incManifestVersion(newPkgVer, ver, command) {
+	let parts = ver.split('.').map(p => +p || 0);
 	if (parts.length < 3) {
 		while (parts.length < 3) parts.push(0);
 	}
-	let sv = parts.slice(0, 3).join('.');
-	if (parts.length === 4) {
-		sv += '-' + parts[3];
+	let manifestSV = semver.coerce(ver);
+	console.log(manifestSV);
+	let pkgSV = semver(newPkgVer);
+	console.log(pkgSV);
+	if (semver.eq(manifestSV, pkgSV) || semver.gt(manifestSV, pkgSV)) {
+		return `${pkgSV.major}.${pkgSV.minor}.${pkgSV.patch}.${parts[3] + 1}`;
 	}
-	sv = semver.inc(sv, command);
-	return sv.replace('-', '.');
+	return `${pkgSV.major}.${pkgSV.minor}.${pkgSV.patch}.0`;
 }
 
 function main() {
@@ -80,7 +82,7 @@ function main() {
 		preid = argv.preid;
 	}
 	let newPkgVersion = incPkgVersion(pkg.version, command, preid);
-	let newManifestVersion = incManifestVersion(manifest.version, command);
+	let newManifestVersion = incManifestVersion(newPkgVersion, manifest.version, command);
 	if (!argv.soft) {
 		updateManifest(newPkgVersion, newManifestVersion);
 		updatePackage(newPkgVersion);
