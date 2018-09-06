@@ -21,9 +21,9 @@
         "postinstall": "cd src/app && yarn && cd -",
         "build": "yarn clean && yarn build:app  && yarn build:ext && yarn build:zip",
         "clean": "rm -rf dist && rm -rf src/app/build",
-        "build:zip": "cd dist/lws-ext && zip -r ../lws-ext-${npm_package_version}.zip ./* && cd -",
+        "build:zip": "cd dist && cp -r lws-ext lws-ext-${npm_package_version}.zip.dir && sed -i -e '/MIGfMA0GCSqGSIb3DQEBAQUA/d' lws-ext-${npm_package_version}.zip.dir/manifest.json && zip -r lws-ext-${npm_package_version}.zip lws-ext-${npm_package_version}.zip.dir && cd -",
         "build:ext": "mkdir -p  dist/lws-ext && cp -r src/ext/* dist/lws-ext",
-        "build:app": "cd src/app && yarn build && cd - && mkdir -p  dist/lws-ext/app && cp -r src/app/build/* dist/lws-ext/app ",
+        "build:app": "cd src/app && yarn build && cd - && mkdir -p  dist/lws-ext/app && cp -r src/app/build/* dist/lws-ext/app",
         "precommit": "pretty-quick --staged && lint-staged",
         "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check",
         "bump-version": "./scripts/bump-version.js"
