@@ -31,7 +31,7 @@ const disallowAttributeReducer = (state, { payload }) => {
 	if (disallow) {
 		return { ...state, disallowed: [...state.disallowed, key] };
 	}
-	return { ...state, disallowed: state.disallow.filter(k => k !== key) };
+	return { ...state, disallowed: state.disallowed.filter(k => k !== key) };
 };
 
 const attributesReducer = (state = initialState, action) => {
