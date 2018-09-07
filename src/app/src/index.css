@@ -1,11 +1,7 @@
-@import url('https://fonts.googleapis.com/css?family=Proxima+Nova');
-
 body {
 	margin: 0;
-	padding: 5px;
-	font-family: 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 }
 
 * {
-	font-family: 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+	font-family: Arial, sans-serif !important;
 }
