@@ -37,7 +37,7 @@ const clearAttributes = () => async (dispatch, getState) => {
 const authWithAttrs = () => async (dispatch, getState) => {
 	const config = appSelectors.getAppConfig(getState());
 	const wallet = walletsSelectors.getSelected(getState());
-	const attributes = attributeSelectors.getAttributes(getState());
+	const attributes = attributeSelectors.getOnlyAllowed(getState());
 
 	try {
 		await dispatch(actions.setAttributesLoading(true));

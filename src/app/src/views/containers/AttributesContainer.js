@@ -10,22 +10,28 @@ class AttributesContainer extends Component {
 			dispatch(attributesOperations.loadAttributes());
 		}
 	}
-	handleAllow = evt => {
+	handleAuth = evt => {
 		this.props.dispatch(attributesOperations.authWithAttrs());
+	};
+	handleDisallow = (attribute, disallow) => {
+		console.log('handleDisallow', attribute, disallow);
+		this.props.dispatch(attributesOperations.disallowAttributes(attribute.key, disallow));
 	};
 	handleCancel = evt => {
 		this.props.dispatch(attributesOperations.clearAttributes());
 	};
 	render() {
-		const { attributes, config, loading } = this.props;
+		const { attributes, config, loading, disallowed } = this.props;
 		if (loading) return <LWSLoading />;
 		return (
 			<LWSRequiredInfo
 				attributes={attributes}
+				notAllowedAttributes={disallowed}
 				website={config.website}
-				required={config.attributes}
-				allowAction={this.handleAllow}
+				requested={config.attributes}
+				allowAction={this.handleAuth}
 				cancelAction={this.handleCancel}
+				disallowAttributeAction={this.handleDisallow}
 			/>
 		);
 	}
@@ -34,7 +40,8 @@ class AttributesContainer extends Component {
 const ConnectedAttributesContainer = connect(state => ({
 	attributes: attributesSelectors.getAttributes(state),
 	config: appSelectors.getAppConfig(state),
-	loading: attributesSelectors.getLoading(state)
+	loading: attributesSelectors.getLoading(state),
+	disallowed: attributesSelectors.getDisallowed(state)
 }))(AttributesContainer);
 
 export default ConnectedAttributesContainer;
