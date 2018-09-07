@@ -1,6 +1,6 @@
 {
     "name": "selfkey-connect",
-    "version": "1.0.0-beta.2",
+    "version": "1.0.0-beta.3",
     "description": "SelfKey Connect Browser Extension",
     "main": "index.js",
     "repository": {
