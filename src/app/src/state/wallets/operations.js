@@ -38,7 +38,10 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 		let wallet = getOneWallet(getState(), publicKey);
 		if (wallet && wallet.unlocked) {
 			await dispatch(actions.selectWallet(publicKey));
-			await dispatch(push(`${config.hash}/auth/attributes`));
+
+			if (!wallet.signedUp || !(await dispatch(loginWithWallet(wallet.publicKey)))) {
+				await dispatch(push(`${config.hash}/auth/attributes`));
+			}
 			return;
 		}
 		let unlocked = await ctx.lwsService.unlock(config.website, publicKey, password);
@@ -50,7 +53,12 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 		await dispatch(actions.updateWallets(null, true));
 		await dispatch(actions.updateOneWallet(unlocked.payload));
 		await dispatch(actions.selectWallet(unlocked.payload.publicKey));
-		await dispatch(push(`${config.hash}/auth/attributes`));
+		if (
+			!unlocked.payload.signedUp ||
+			!(await dispatch(loginWithWallet(unlocked.payload.publicKey)))
+		) {
+			await dispatch(push(`${config.hash}/auth/attributes`));
+		}
 	} catch (error) {
 		console.error(error);
 		await dispatch(actions.updateWallets(error.payload, true));
@@ -59,4 +67,16 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 	}
 };
 
-export default { ...actions, loadWallets, unlockWallet };
+const loginWithWallet = publicKey => async (dispatch, getState) => {
+	const config = appSelectors.getAppConfig(getState());
+	try {
+		await ctx.lwsService.sendAuth(config.website, publicKey);
+		await dispatch(push(`${config.hash}/auth/success`));
+		return true;
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
+};
+
+export default { ...actions, loadWallets, unlockWallet, loginWithWallet };
