@@ -18,6 +18,7 @@
         "redux-thunk": "^2.3.0"
     },
     "scripts": {
+        "test": "echo 'please implement tests'",
         "postinstall": "cd src/app && yarn && cd -",
         "build": "yarn clean && yarn build:app  && yarn build:ext && yarn build:zip",
         "clean": "rm -rf dist && rm -rf src/app/build",

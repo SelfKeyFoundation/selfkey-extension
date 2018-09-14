@@ -1,0 +1,101 @@
+version: 2
+aliases:
+  - &cache_version '1'
+  - &step_prepare_cache_buster
+    run:
+      name: Prepare Cache Buster
+      command: echo ${CACHE_VERSION} > /tmp/cache_buster
+  - &step_restore_cache
+    restore_cache:
+      name: Restore Yarn Package Cache
+      keys:
+        - yarn-packages-{{ checksum "/tmp/cache_buster" }}-{{ .Branch }}
+        - yarn-packages-{{ checksum "/tmp/cache_buster" }}}-master
+        - yarn-packages-{{ checksum "/tmp/cache_buster" }}-
+  - &step_save_cache
+    save_cache:
+      name: Save Yarn Package Cache
+      key: yarn-packages-{{ checksum "/tmp/cache_buster" }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      paths:
+        - node_modules/
+  - &step_yarn_upgrade
+    run:
+      name: Upgrade Yarn
+      command: npm install -g yarn@latest
+
+jobs:
+  'unit-test':
+    docker: &DOCKERIMAGE
+      - image: circleci/node:9.5.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/linux
+      - run:
+          name: Install Node Packages
+          command: yarn
+      - run:
+          name: Unit Tests
+          command: yarn test
+
+  build:
+    docker: *DOCKERIMAGE
+    environment:
+      CACHE_VERSION: *cache_version
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/linux
+      - *step_prepare_cache_buster
+      - *step_restore_cache
+      - run:
+          name: Install Node Packages
+          command: yarn install
+      - run:
+          name: Build App
+          command: yarn build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+      - store_artifacts:
+          path: dist
+      - *step_save_cache
+
+  'publish':
+    docker: *DOCKERIMAGE
+    environment:
+      APP_ID: 320557215150-k37svubo27bdr433p7b8dudvbh7n1gla.apps.googleusercontent.com
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/linux
+      - run:
+          name: Install OS Dependecies
+          command: |
+            sudo apt-get update
+            sudo apt-get -y install curl jq
+      - run:
+          name: Publish App to Webstore
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&refresh_token=${REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
+              curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T ./dist/lws-ext-*.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${APP_ID}"
+              curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/${APP_ID}/publish"
+            fi
+workflows:
+  version: 2
+  main:
+    jobs:
+      - 'unit-test'
+      - 'build':
+          requires:
+            - unit-test
+      - 'publish':
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
