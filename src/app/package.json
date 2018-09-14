@@ -13,7 +13,7 @@
         "react-scripts": "1.1.4",
         "redux": "^4.0.0",
         "redux-logger": "^3.0.6",
-        "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#9bf618b981f8d482e5770a63c5e842da4fbd7c5e"
+        "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#2e76d013d2588bdc99977c81432496eebe710777"
     },
     "devDependencies": {
         "eslint": "^4.17.0",
