@@ -28,7 +28,7 @@ class AttributesContainer extends Component {
 				attributes={attributes}
 				notAllowedAttributes={disallowed}
 				website={config.website}
-				requested={config.attributes}
+				required={config.attributes}
 				allowAction={this.handleAuth}
 				cancelAction={this.handleCancel}
 				disallowAttributeAction={this.handleDisallow}
