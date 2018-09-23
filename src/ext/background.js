@@ -1,9 +1,10 @@
 'use strict';
 
 const WS_URL = 'ws://localhost:8898';
+const WSS_URL = 'wss://localhost:8899';
 const CONTENT_PORT_NAME = 'LWS_CONTENT';
 const APP_PORT_NAME = 'LWS_APP';
-const ALLOWED_REQUESTS = ['wp_init', 'app_init', 'wallets', 'unlock', 'attributes', 'auth'];
+const ALLOWED_REQUESTS = ['wp_init', 'app_init', 'init', 'wallets', 'unlock', 'attributes', 'auth'];
 const MSG_SRC = 'lws_bg';
 const WS_REQ_TIMEOUT = 5000;
 const WS_RECONNECT_INTERVAL = 5000;
@@ -13,6 +14,7 @@ const bg = {
 	ports: [],
 	ws: null,
 	wsReqs: {},
+	wssReqs: {},
 	conns: {}
 };
 
@@ -66,9 +68,8 @@ const handleWSMessage = ctx => evt => {
 		console.log('unknown message', msg);
 		return;
 	}
-	req.handleRes(msg);
-	if (msg.type === 'auth' && req.ctx.port) {
-		req.ctx.port.postMessage(fmtMessage({ type: 'wp_auth', payload: msg.payload }, msg));
+	if (msg.type === 'init') {
+		initWSS();
 	}
 };
 
@@ -87,7 +88,7 @@ const handleWSClose = ctx => () => {
 	}, WS_RECONNECT_INTERVAL);
 };
 
-const handleWsOpen = ctx => () => {
+const handleWSOpen = ctx => () => {
 	console.log('ws connection established');
 };
 
@@ -97,10 +98,75 @@ const handleWSError = () => evt => {
 
 const initWS = ctx => {
 	const ws = (bg.ws = new WebSocket(WS_URL));
-	ws.addEventListener('open', handleWsOpen(ctx));
+	ws.addEventListener('open', handleWSOpen(ctx));
 	ws.addEventListener('message', handleWSMessage(ctx));
 	ws.addEventListener('close', handleWSClose(ctx));
 	ws.addEventListener('error', handleWSError(ctx));
+};
+
+// WSS
+
+const sendToWss = (msg, ctx, sendResponse) => {
+	const msgId = msg.meta.id;
+	bg.wssReqs[msgId] = { req: msg, ctx };
+	bg.wssReqs[msgId].handleRes = res => {
+		clearTimeout(bg.wssReqs[msgId].timeout);
+		sendResponse(res, msg);
+		delete bg.wssReqs[msgId];
+	};
+	bg.wssReqs[msgId].timeout = setTimeout(() => {
+		if (!bg.wssReqs[msgId]) return;
+		bg.wssReqs[msgId].handleRes({
+			error: true,
+			payload: { code: 'response_timeout', message: 'Response timed out' }
+		});
+	}, WS_REQ_TIMEOUT);
+	bg.wss.send(JSON.stringify(msg));
+};
+
+const handleWSSMessage = ctx => evt => {
+	let msg = JSON.parse(evt.data);
+	let id = (msg.meta || {}).id;
+	let req = bg.wssReqs[id];
+	if (!req) {
+		console.log('unknown message', msg);
+		return;
+	}
+	req.handleRes(msg);
+	if (msg.type === 'auth' && req.ctx.port) {
+		req.ctx.port.postMessage(fmtMessage({ type: 'wp_auth', payload: msg.payload }, msg));
+	}
+};
+
+const handleWSSClose = ctx => () => {
+	console.log('ws connection closed');
+	sendToAllPorts(
+		fmtMessage({
+			error: true,
+			payload: { code: 'idw_disconnect', message: 'IDW disconnected' }
+		})
+	);
+	bg.ws = null;
+	setTimeout(() => {
+		console.log('trying to reconnct wss');
+		initWS(ctx);
+	}, WS_RECONNECT_INTERVAL);
+};
+
+const handleWSSOpen = ctx => () => {
+	console.log('wss connection established');
+};
+
+const handleWSSError = () => evt => {
+	console.error('wss error', evt);
+};
+
+const initWSS = ctx => {
+	const wss = (bg.wss = new WebSocket(WSS_URL));
+	wss.addEventListener('open', handleWSSOpen(ctx));
+	wss.addEventListener('message', handleWSSMessage(ctx));
+	wss.addEventListener('close', handleWSSClose(ctx));
+	wss.addEventListener('error', handleWSSError(ctx));
 };
 
 const genConnHash = () => {

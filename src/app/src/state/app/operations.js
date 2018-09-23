@@ -8,6 +8,12 @@ const initApp = hash => async (dispatch, getState) => {
 		await dispatch(actions.setAppConfig({ hash }));
 		let config = await ctx.lwsService.connect(hash);
 		await dispatch(actions.setAppConfig({ ...config, hash }));
+		let wss = await ctx.lwsService.checkWSS(hash);
+		if (wss.error) {
+			// eslint-disable-next-line no-throw-literal
+			throw { error: true, payload: { code: 'no_wss', message: 'No WSS' } };
+			return dispatch(push(`${config.hash}/error/no-wss`));
+		}
 		await dispatch(actions.setAppError(null));
 		await dispatch(push(`${hash}/wallets`));
 	} catch (error) {
