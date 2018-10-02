@@ -4,7 +4,15 @@ const WS_URL = 'ws://localhost:8898';
 const WSS_URL = 'wss://localhost:8899';
 const CONTENT_PORT_NAME = 'LWS_CONTENT';
 const APP_PORT_NAME = 'LWS_APP';
-const ALLOWED_REQUESTS = ['wp_init', 'app_init', 'init', 'wallets', 'unlock', 'attributes', 'auth'];
+const ALLOWED_REQUESTS = [
+	'wp_init',
+	'app_init',
+	'wss_init',
+	'wallets',
+	'unlock',
+	'attributes',
+	'auth'
+];
 const MSG_SRC = 'lws_bg';
 const WS_REQ_TIMEOUT = 5000;
 const WS_RECONNECT_INTERVAL = 5000;
@@ -66,10 +74,6 @@ const handleWSMessage = ctx => evt => {
 	let req = bg.wsReqs[id];
 	if (!req) {
 		console.log('unknown message', msg);
-		return;
-	}
-	if (msg.type === 'init') {
-		initWSS();
 	}
 };
 
@@ -107,6 +111,8 @@ const initWS = ctx => {
 // WSS
 
 const sendToWss = (msg, ctx, sendResponse) => {
+	console.log(ctx);
+	console.log(msg);
 	const msgId = msg.meta.id;
 	bg.wssReqs[msgId] = { req: msg, ctx };
 	bg.wssReqs[msgId].handleRes = res => {
@@ -139,7 +145,7 @@ const handleWSSMessage = ctx => evt => {
 };
 
 const handleWSSClose = ctx => () => {
-	console.log('ws connection closed');
+	console.log('wss connection closed');
 	sendToAllPorts(
 		fmtMessage({
 			error: true,
@@ -148,8 +154,8 @@ const handleWSSClose = ctx => () => {
 	);
 	bg.ws = null;
 	setTimeout(() => {
-		console.log('trying to reconnct wss');
-		initWS(ctx);
+		console.log('trying to reconnect wss');
+		initWSS(ctx);
 	}, WS_RECONNECT_INTERVAL);
 };
 
@@ -177,6 +183,8 @@ const genConnHash = () => {
 const handlePortMessage = ctx => (msg, port) => {
 	const sendResponse = (msg, req) => port.postMessage(fmtMessage(msg, req));
 	console.log(port.name, msg);
+	let wsMessage = fmtMessage({ payload: msg.payload }, msg);
+
 	if (!msg.type || !ALLOWED_REQUESTS.includes(msg.type)) {
 		sendResponse(
 			{
@@ -201,6 +209,13 @@ const handlePortMessage = ctx => (msg, port) => {
 		return sendResponse({ payload: ctx.config }, msg);
 	}
 
+	if (msg.type === 'wss_init') {
+		initWSS();
+		console.log('wss_init from app', ctx);
+		sendResponse({ payload: 'wss' }, msg);
+		return sendToWs(wsMessage, ctx, sendResponse);
+	}
+
 	if (!bg.ws || bg.ws.readyState !== 1) {
 		sendResponse(
 			{
@@ -212,8 +227,7 @@ const handlePortMessage = ctx => (msg, port) => {
 		return;
 	}
 
-	let wsMessage = fmtMessage({ payload: msg.payload }, msg);
-	sendToWs(wsMessage, ctx, sendResponse);
+	sendToWss(wsMessage, ctx, sendResponse);
 };
 
 const genConnContext = port => {
@@ -244,7 +258,7 @@ const handleConnection = port => {
 	console.log('port connected', port.name);
 	bg.ports.push(port);
 	const ctx = genConnContext(port);
-	if (!ctx) throw new Error('invlid connection');
+	if (!ctx) throw new Error('invalid connection');
 
 	port.onMessage.addListener(handlePortMessage(ctx));
 	port.onDisconnect.addListener(port => {

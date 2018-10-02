@@ -33,7 +33,7 @@ export class LWSService {
 
 	checkWSS() {
 		return this.sendRequest({
-			type: 'init'
+			type: 'wss_init'
 		});
 	}
 
