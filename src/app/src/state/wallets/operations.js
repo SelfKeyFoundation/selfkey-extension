@@ -8,7 +8,7 @@ const loadWallets = () => async (dispatch, getState) => {
 	const config = appSelectors.getAppConfig(getState());
 	try {
 		await dispatch(appOperations.setAppLoading(true));
-		let wallets = await ctx.lwsService.getWallelts(config.website);
+		let wallets = await ctx.lwsService.getWallets(config.website);
 		if (!wallets.payload.length) {
 			// eslint-disable-next-line no-throw-literal
 			throw { error: true, payload: { code: 'no_id', message: 'No selfkey ID' } };

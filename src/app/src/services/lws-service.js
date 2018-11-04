@@ -31,7 +31,13 @@ export class LWSService {
 		this.port = null;
 	}
 
-	getWallelts(website) {
+	checkWSS() {
+		return this.sendRequest({
+			type: 'wss_init'
+		});
+	}
+
+	getWallets(website) {
 		return this.sendRequest({
 			type: 'wallets',
 			payload: {
