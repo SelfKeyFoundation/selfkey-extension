@@ -2,8 +2,8 @@
 /* globals chrome */
 var PORT_NAME = 'LWS_CONTENT';
 
-const MSG_SRC = 'lws_content';
-const WP_SRC = 'lws_client';
+const MSG_SRC = 'content';
+const WP_SRC = 'browser_lib';
 
 var contentScript = {
 	msgId: 0
@@ -17,7 +17,7 @@ const fmtMessage = (msg, req) => {
 	if (!id && req.meta && req.meta.id) {
 		id = req.meta.id;
 	}
-	msg.meta.id = id || `${MSG_SRC}_${contentScript.msgId++}`;
+	msg.meta.id = id || `${MSG_SRC}-${contentScript.msgId++}`;
 	msg.meta.src = msg.meta.src || MSG_SRC;
 	if (!msg.type && msg.error) {
 		msg.error = true;
@@ -42,6 +42,8 @@ function handleWebPageMessage(evt) {
 	var msg = evt.data;
 	if (window !== evt.source) return;
 	if (!msg || !msg.type || !msg.meta || msg.meta.src !== WP_SRC) return;
+
+	msg.payload.meta.origin = window.location;
 
 	switch (msg.type) {
 		case 'wp_init':
@@ -104,6 +106,7 @@ function handleTearDownFromBg(msg) {
 			message: 'Failed to teardown LWS'
 		};
 	}
+	sendToWindow(winMsg, msg);
 }
 
 function sendUnknownMsgToPage(msg) {

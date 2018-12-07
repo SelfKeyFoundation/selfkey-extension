@@ -13,7 +13,7 @@ const ALLOWED_REQUESTS = [
 	'attributes',
 	'auth'
 ];
-const MSG_SRC = 'lws_bg';
+const MSG_SRC = 'bg';
 const WS_REQ_TIMEOUT = 5000;
 const WS_RECONNECT_INTERVAL = 5000;
 
@@ -37,7 +37,7 @@ const fmtMessage = (msg, req) => {
 	if (!id && req.meta && req.meta.id) {
 		id = req.meta.id;
 	}
-	msg.meta.id = id || `${MSG_SRC}_${bg.msgId++}`;
+	msg.meta.id = id || `${MSG_SRC}-${bg.msgId++}`;
 	msg.meta.src = msg.meta.src || MSG_SRC;
 	if (!msg.type && msg.error) {
 		msg.type = 'error';
@@ -205,8 +205,7 @@ const handlePortMessage = ctx => async (msg, port) => {
 		return sendResponse({ payload: ctx.hash }, msg);
 	} else if (msg.type === 'app_init') {
 		console.log('init from app', ctx);
-		sendResponse({ payload: ctx.config }, msg);
-		return sendToWs(wsMessage, ctx, sendResponse);
+		return sendResponse({ payload: ctx.config }, msg);
 	} else if (msg.type === 'wss_init') {
 		await sendToWs(wsMessage, ctx, sendResponse);
 		await initWSS();
