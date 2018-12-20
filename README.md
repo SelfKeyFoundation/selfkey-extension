@@ -1,7 +1,7 @@
-# SelfKey Connect Browser Extension
+# SelfKey Extension
 
-## About SelfKey Connect
-To create both a convenient user interface and a communications link between the IDW and the LWS server integration, we have developed SelfKey Connect - a Web Browser Extension that provides the user with a way to interact with the other related components directly from the browser window. In its current implementation it can select available wallet addresses and unlock them remotely using password / keystore file and then choose the wallet for authentication using LWS simultaneously directing the IDW to pass over the data and documents requested by the server integration if needed.
+## About the SelfKey Extension
+To create both a convenient user interface and a communications link between the IDW and the LWS server integration, we have developed the SelfKey Extension - a Web Browser Extension that provides the user with a way to interact with the other related components directly from the browser window. In its current implementation it can select available wallet addresses and unlock them remotely using password / keystore file and then choose the wallet for authentication using LWS simultaneously directing the IDW to pass over the data and documents requested by the server integration if needed.
 
 ## Features
 * View Wallets Available -> request to IDW, takes response array and displays in UI
@@ -18,16 +18,16 @@ To create both a convenient user interface and a communications link between the
 * Go to `chrome://extensions/` in your Chrome browser
 * Enable the "Developer Mode" toggle
 * Click "Load Unpacked" from the navbar
-* Select the `src` directory of the repository
+* Select the `dist` directory of the repository
 
-The SelfKey Connect Browser Extension should now be enabled.
+The SelfKey Extension should now be enabled.
 
 ## Contributing
 
 Please see the [contributing notes](CONTRIBUTING.md).
 
 ## License
-SelfKey Connect Browser Extension    
+SelfKey Extension    
 Copyright (c) 2018 SelfKey Foundation [https://selfkey.org/](https://selfkey.org/)
 
 [The GPL-3.0 License](http://opensource.org/licenses/GPL-3.0)

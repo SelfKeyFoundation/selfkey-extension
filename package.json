@@ -1,11 +1,11 @@
 {
-    "name": "selfkey-connect",
+    "name": "selfkey-extension",
     "version": "1.0.0-beta.6",
-    "description": "SelfKey Connect Browser Extension",
+    "description": "SelfKey Extension",
     "main": "index.js",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/kyc-chain/selfkey-connect.git"
+        "url": "git+https://github.com/SelfKeyFoundation/selfkey-extension.git"
     },
     "author": {
         "name": "SelfKey Foundation",
@@ -20,9 +20,9 @@
         }
     ],
     "bugs": {
-        "url": "https://github.com/kyc-chain/selfkey-connect/issues"
+        "url": "https://github.com/SelfKeyFoundation/selfkey-extension/issues"
     },
-    "homepage": "https://github.com/kyc-chain/selfkey-connect#readme",
+    "homepage": "https://github.com/SelfKeyFoundation/selfkey-extension#readme",
     "dependencies": {
         "awilix": "^3.0.9",
         "redux-thunk": "^2.3.0"
