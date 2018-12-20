@@ -15,22 +15,9 @@ class App extends Component {
 	}
 	render() {
 		const { children, loading, error } = this.props;
-		let hcss = {
-			color: '#23E6FE',
-			fontSize: '16px'
-		};
-		let pcss = {
-			color: '#23E6FE',
-			fontSize: '12px'
-		};
 		if (loading) {
 			return (
 				<div>
-					<h1 style={hcss}>Connecting please wait...</h1>
-					<p style={pcss}>
-						if this is your first time using SelfKey Connect please check the SelfKey
-						Identity Wallet for steps to set up a secure connection
-					</p>
 					<LWSLoading />
 				</div>
 			);

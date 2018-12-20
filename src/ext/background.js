@@ -1,19 +1,10 @@
 'use strict';
 
 const WS_URL = 'ws://localhost:8898';
-const WSS_URL = 'wss://localhost:8899';
 const CONTENT_PORT_NAME = 'LWS_CONTENT';
 const APP_PORT_NAME = 'LWS_APP';
-const ALLOWED_REQUESTS = [
-	'wp_init',
-	'app_init',
-	'wss_init',
-	'wallets',
-	'unlock',
-	'attributes',
-	'auth'
-];
-const MSG_SRC = 'lws_bg';
+const ALLOWED_REQUESTS = ['wp_init', 'app_init', 'wallets', 'unlock', 'attributes', 'auth'];
+const MSG_SRC = 'bg';
 const WS_REQ_TIMEOUT = 5000;
 const WS_RECONNECT_INTERVAL = 5000;
 
@@ -21,9 +12,7 @@ const bg = {
 	msgId: 0,
 	ports: [],
 	ws: null,
-	wss: null,
 	wsReqs: {},
-	wssReqs: {},
 	conns: {}
 };
 
@@ -76,6 +65,10 @@ const handleWSMessage = ctx => evt => {
 	if (!req) {
 		console.log('unknown message', msg);
 	}
+	req.handleRes(msg);
+	if (msg.type === 'auth' && req.ctx.port) {
+		req.ctx.port.postMessage(fmtMessage({ type: 'wp_auth', payload: msg.payload }, msg));
+	}
 };
 
 const handleWSClose = ctx => () => {
@@ -109,76 +102,6 @@ const initWS = ctx => {
 	ws.addEventListener('error', handleWSError(ctx));
 };
 
-// WSS
-
-const sendToWss = (msg, ctx, sendResponse) => {
-	console.log(ctx);
-	console.log(msg);
-	const msgId = msg.meta.id;
-	bg.wssReqs[msgId] = { req: msg, ctx };
-	bg.wssReqs[msgId].handleRes = res => {
-		clearTimeout(bg.wssReqs[msgId].timeout);
-		sendResponse(res, msg);
-		delete bg.wssReqs[msgId];
-	};
-	bg.wssReqs[msgId].timeout = setTimeout(() => {
-		if (!bg.wssReqs[msgId]) return;
-		bg.wssReqs[msgId].handleRes({
-			error: true,
-			payload: { code: 'response_timeout', message: 'Response timed out' }
-		});
-	}, WS_REQ_TIMEOUT);
-	bg.wss.send(JSON.stringify(msg));
-};
-
-const handleWSSMessage = ctx => evt => {
-	let msg = JSON.parse(evt.data);
-	let id = (msg.meta || {}).id;
-	let req = bg.wssReqs[id];
-	if (!req) {
-		console.log('unknown message', msg);
-		return;
-	}
-	req.handleRes(msg);
-	if (msg.type === 'auth' && req.ctx.port) {
-		req.ctx.port.postMessage(fmtMessage({ type: 'wp_auth', payload: msg.payload }, msg));
-	}
-};
-
-const handleWSSClose = ctx => () => {
-	console.log('wss connection closed');
-	sendToAllPorts(
-		fmtMessage({
-			error: true,
-			payload: { code: 'idw_disconnect', message: 'IDW disconnected' }
-		})
-	);
-	bg.wss = null;
-	setTimeout(() => {
-		console.log('trying to reconnect wss');
-		initWSS(ctx);
-	}, WS_RECONNECT_INTERVAL);
-};
-
-const handleWSSOpen = ctx => () => {
-	console.log('wss connection established');
-};
-
-const handleWSSError = () => evt => {
-	console.error('wss error', evt);
-};
-
-const initWSS = ctx => {
-	return new Promise(resolve => {
-		const wss = (bg.wss = new WebSocket(WSS_URL));
-		wss.addEventListener('open', handleWSSOpen(ctx));
-		wss.addEventListener('message', handleWSSMessage(ctx));
-		wss.addEventListener('close', handleWSSClose(ctx));
-		wss.addEventListener('error', handleWSSError(ctx));
-		resolve(true);
-	});
-};
-
 const genConnHash = () => {
 	// TODO: make this secure
 	return Math.random();
@@ -186,7 +109,6 @@ const genConnHash = () => {
 
 const handlePortMessage = ctx => async (msg, port) => {
 	const sendResponse = (msg, req) => port.postMessage(fmtMessage(msg, req));
-	console.log(port.name, msg);
 	let wsMessage = fmtMessage({ payload: msg.payload }, msg);
 
 	if (!msg.type || !ALLOWED_REQUESTS.includes(msg.type)) {
@@ -200,45 +122,27 @@ const handlePortMessage = ctx => async (msg, port) => {
 			},
 			msg
 		);
+		return;
 	} else if (msg.type === 'wp_init') {
 		ctx.config = msg.payload;
 		return sendResponse({ payload: ctx.hash }, msg);
 	} else if (msg.type === 'app_init') {
 		console.log('init from app', ctx);
-		sendResponse({ payload: ctx.config }, msg);
-		return sendToWs(wsMessage, ctx, sendResponse);
-	} else if (msg.type === 'wss_init') {
-		await sendToWs(wsMessage, ctx, sendResponse);
-		await initWSS();
-		console.log('wss_init from app', ctx);
-		return sendResponse({ payload: 'wss' }, msg);
+		return sendResponse({ payload: ctx.config }, msg);
 	}
 
-	// if (!bg.ws || bg.ws.readyState !== 1) {
-	// 	sendResponse(
-	// 		{
-	// 			error: true,
-	// 			payload: { code: 'idw_no_conn', message: 'No WS connection to IDW' }
-	// 		},
-	// 		msg
-	// 	);
-	// 	return;
-	// } else
-
-	// if (!bg.wss || bg.wss.readyState !== 1) {
-	// 	console.log(bg.wss)
-	// 	sendResponse(
-	// 		{
-	// 			error: true,
-	// 			payload: { code: 'idw_no_conn', message: 'No WSS connection to IDW' }
-	// 		},
-	// 		msg
-	// 	);
-	// 	return;
-	// } else
-	else {
-		return sendToWss(wsMessage, ctx, sendResponse);
+	if (!bg.ws || bg.ws.readyState !== 1) {
+		sendResponse(
+			{
+				error: true,
+				payload: { code: 'idw_no_conn', message: 'No WS connection to IDW' }
+			},
+			msg
+		);
+		return;
 	}
+
+	return sendToWs(wsMessage, ctx, sendResponse);
 };
 
 const genConnContext = port => {
