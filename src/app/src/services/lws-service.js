@@ -1,5 +1,5 @@
 /* global chrome */
-const MSG_SRC = 'lws_app';
+const MSG_SRC = 'popup';
 const PORT_NAME = 'LWS_APP';
 const BG_REQ_TIMEOUT = 5000;
 export class LWSService {
@@ -106,7 +106,7 @@ export class LWSService {
 		if (!id && req.meta && req.meta.id) {
 			id = req.meta.id;
 		}
-		msg.meta.id = id || `${MSG_SRC}_${this.msgId++}`;
+		msg.meta.id = id || `${MSG_SRC}-${this.msgId++}`;
 		msg.meta.src = msg.meta.src || MSG_SRC;
 		if (!msg.type && msg.error) {
 			msg.error = true;

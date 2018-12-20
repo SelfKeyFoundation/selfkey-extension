@@ -26,7 +26,7 @@ const fmtMessage = (msg, req) => {
 	if (!id && req.meta && req.meta.id) {
 		id = req.meta.id;
 	}
-	msg.meta.id = id || `${MSG_SRC}_${bg.msgId++}`;
+	msg.meta.id = id || `${MSG_SRC}-${bg.msgId++}`;
 	msg.meta.src = msg.meta.src || MSG_SRC;
 	if (!msg.type && msg.error) {
 		msg.type = 'error';
