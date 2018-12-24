@@ -31,11 +31,11 @@ export class LWSService {
 		this.port = null;
 	}
 
-	getWallets(website) {
+	getWallets(config) {
 		return this.sendRequest({
 			type: 'wallets',
 			payload: {
-				website
+				config
 			}
 		});
 	}
@@ -50,19 +50,19 @@ export class LWSService {
 		});
 	}
 
-	unlock(website, publicKey, password) {
+	unlock(config, publicKey, password) {
 		console.log('app: unlock', publicKey, password);
 		return this.sendRequest({
 			type: 'unlock',
-			payload: { website, publicKey, password }
+			payload: { config, publicKey, password }
 		});
 	}
 
-	sendAuth(website, publicKey, attributes) {
+	sendAuth(config, publicKey, attributes) {
 		return this.sendRequest({
 			type: 'auth',
 			payload: {
-				website,
+				config,
 				publicKey,
 				attributes
 			}

@@ -8,7 +8,7 @@ const loadWallets = () => async (dispatch, getState) => {
 	const config = appSelectors.getAppConfig(getState());
 	try {
 		await dispatch(appOperations.setAppLoading(true));
-		let wallets = await ctx.lwsService.getWallets(config.website);
+		let wallets = await ctx.lwsService.getWallets(config);
 		if (!wallets.payload.length) {
 			// eslint-disable-next-line no-throw-literal
 			throw { error: true, payload: { code: 'no_id', message: 'No selfkey ID' } };
@@ -44,7 +44,7 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 			}
 			return;
 		}
-		let unlocked = await ctx.lwsService.unlock(config.website, publicKey, password);
+		let unlocked = await ctx.lwsService.unlock(config, publicKey, password);
 		if (!unlocked.payload.unlocked) {
 			return dispatch(
 				actions.updateWallets({ code: 'unlock_failed', message: 'Failed to unlock' }, true)
@@ -70,7 +70,7 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 const loginWithWallet = publicKey => async (dispatch, getState) => {
 	const config = appSelectors.getAppConfig(getState());
 	try {
-		await ctx.lwsService.sendAuth(config.website, publicKey);
+		await ctx.lwsService.sendAuth(config, publicKey);
 		await dispatch(push(`${config.hash}/auth/success`));
 		return true;
 	} catch (error) {
