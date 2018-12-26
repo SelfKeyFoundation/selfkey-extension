@@ -12,7 +12,8 @@ const loadAttributes = () => async (dispatch, getState) => {
 	try {
 		await dispatch(actions.setAttributesLoading(true));
 		let attributes = await ctx.lwsService.getAttributes(wallet.publicKey, config.attributes);
-		await dispatch(actions.updateAttributes(attributes.payload));
+		await dispatch(actions.updateAttributes(attributes.payload.attributes));
+		console.log('XXX', getState());
 	} catch (error) {
 		await dispatch(actions.updateAttributes(error.payload, true));
 		if (!error.payload) {
