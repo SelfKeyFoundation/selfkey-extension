@@ -107,6 +107,33 @@ const genConnHash = () => {
 	return Math.random();
 };
 
+const validateConfig = config => {
+	const { website, rootEndpoint, endpoints, origin } = config;
+	if (!website) throw new Error('Config object does not contain website options');
+	let { name, url } = website;
+	if (!name || typeof name !== 'string') {
+		throw new Error('Website name is required');
+	}
+	if (!url || typeof url !== 'string') {
+		throw new Error('Website url is required');
+	}
+	try {
+		url = new URL(url);
+	} catch (error) {
+		throw new Error('Website url is invalid');
+	}
+	if (!origin || typeof origin !== 'string') {
+		throw new Error('Website origin is required');
+	}
+	if (origin !== url.origin) {
+		throw new Error('Website origin and url do not mach');
+	}
+	if (!rootEndpoint && !endpoints) {
+		throw new Error('API endpoint must be provided');
+	}
+	return true;
+};
+
 const handlePortMessage = ctx => async (msg, port) => {
 	const sendResponse = (msg, req) => port.postMessage(fmtMessage(msg, req));
 	let wsMessage = fmtMessage({ payload: msg.payload }, msg);
@@ -124,7 +151,16 @@ const handlePortMessage = ctx => async (msg, port) => {
 		);
 		return;
 	} else if (msg.type === 'wp_init') {
-		ctx.config = msg.payload;
+		let config = msg.payload;
+		try {
+			validateConfig(config);
+		} catch (error) {
+			return sendResponse(
+				{ error: true, payload: { code: 'invalid_config', message: error.message } },
+				msg
+			);
+		}
+		ctx.config = config;
 		return sendResponse({ payload: ctx.hash }, msg);
 	} else if (msg.type === 'app_init') {
 		console.log('init from app', ctx);

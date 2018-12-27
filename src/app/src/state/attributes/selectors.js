@@ -6,10 +6,6 @@ export const getDisallowed = ({ attributes }) => {
 export const getOnlyAllowed = ({ attributes }) =>
 	attributes.list
 		.filter(k => {
-			let attr = attributes.byUrl[k];
-			if (!attr.data || Object.keys(attr.data).length === 0) {
-				return false;
-			}
 			return attributes.disallowed.indexOf(k) < 0;
 		})
 		.map(k => attributes.byUrl[k]);
