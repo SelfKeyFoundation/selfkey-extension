@@ -5,6 +5,7 @@ const CONTENT_PORT_NAME = 'LWS_CONTENT';
 const APP_PORT_NAME = 'LWS_APP';
 const ALLOWED_REQUESTS = [
 	'wp_init',
+	'wp_auth',
 	'app_init',
 	'wallets',
 	'unlock',
@@ -74,9 +75,6 @@ const handleWSMessage = ctx => evt => {
 		console.log('unknown message', msg);
 	}
 	req.handleRes(msg);
-	if (msg.type === 'auth' && req.ctx.port) {
-		req.ctx.port.postMessage(fmtMessage({ type: 'wp_auth', payload: msg.payload }, msg));
-	}
 };
 
 const handleWSClose = ctx => () => {
@@ -173,6 +171,11 @@ const handlePortMessage = ctx => async (msg, port) => {
 	} else if (msg.type === 'app_init') {
 		console.log('init from app', ctx);
 		return sendResponse({ payload: ctx.config }, msg);
+	} else if (msg.type === 'wp_auth') {
+		if (port === ctx.port) return null;
+		ctx.port.postMessage(fmtMessage(msg));
+		sendResponse({ payload: 'ok' }, msg);
+		return;
 	}
 
 	if (!bg.ws || bg.ws.readyState !== 1) {

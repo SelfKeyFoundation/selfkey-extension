@@ -68,6 +68,14 @@ export class LWSService {
 		});
 	}
 
+	sendWPAuth(payload, error) {
+		return this.sendRequest({
+			type: 'wp_auth',
+			payload,
+			error: !!error
+		});
+	}
+
 	sendSignup(config, publicKey, attributes) {
 		return this.sendRequest({
 			type: 'signup',
