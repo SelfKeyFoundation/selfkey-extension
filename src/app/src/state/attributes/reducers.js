@@ -11,7 +11,6 @@ const updateAttributesReducer = (state, { payload, error }) => {
 	if (error) {
 		return { ...state, error: payload };
 	}
-	console.log('XXX', 'updating attributes', payload);
 	let attributesState = (payload || []).reduce(
 		(acc, attr) => {
 			acc.list = [...acc.list, attr.url];
@@ -20,7 +19,6 @@ const updateAttributesReducer = (state, { payload, error }) => {
 		},
 		{ ...initialState }
 	);
-	console.log('XXX update', state, '->', attributesState);
 	return attributesState;
 };
 

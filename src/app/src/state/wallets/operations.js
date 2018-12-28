@@ -70,8 +70,8 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 const loginWithWallet = publicKey => async (dispatch, getState) => {
 	const config = appSelectors.getAppConfig(getState());
 	try {
-		let resp = await ctx.lwsService.sendAuth(config, publicKey);
-		await ctx.lwsService.sendWPAuth(resp.payload, resp.error);
+		let authResp = await ctx.lwsService.sendAuth(config, publicKey);
+		await ctx.lwsService.sendWPAuth(authResp.payload, authResp.error);
 		await dispatch(push(`${config.hash}/auth/success`));
 		return true;
 	} catch (error) {
