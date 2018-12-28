@@ -42,7 +42,8 @@ const authWithAttrs = () => async (dispatch, getState) => {
 
 	try {
 		await dispatch(actions.setAttributesLoading(true));
-		await ctx.lwsService.sendAuth(config, wallet.publicKey, attributes);
+		await ctx.lwsService.sendSignup(config, wallet.publicKey, attributes);
+		await ctx.lwsService.sendAuth(config, wallet.publicKey);
 		await dispatch(push(`${config.hash}/auth/success`));
 	} catch (error) {
 		console.log('auth error', error);

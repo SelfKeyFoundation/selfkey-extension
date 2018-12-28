@@ -3,7 +3,15 @@
 const WS_URL = 'ws://localhost:8898';
 const CONTENT_PORT_NAME = 'LWS_CONTENT';
 const APP_PORT_NAME = 'LWS_APP';
-const ALLOWED_REQUESTS = ['wp_init', 'app_init', 'wallets', 'unlock', 'attributes', 'auth'];
+const ALLOWED_REQUESTS = [
+	'wp_init',
+	'app_init',
+	'wallets',
+	'unlock',
+	'attributes',
+	'auth',
+	'signup'
+];
 const MSG_SRC = 'bg';
 const WS_REQ_TIMEOUT = 5000;
 const WS_RECONNECT_INTERVAL = 5000;

@@ -15,14 +15,13 @@ class AttributesContainer extends Component {
 	};
 	handleDisallow = (attribute, disallow) => {
 		console.log('handleDisallow', attribute, disallow);
-		this.props.dispatch(attributesOperations.disallowAttributes(attribute, disallow));
+		this.props.dispatch(attributesOperations.disallowAttributes(attribute.url, disallow));
 	};
 	handleCancel = evt => {
 		this.props.dispatch(attributesOperations.clearAttributes());
 	};
 	render() {
 		const { attributes, config, loading, disallowed } = this.props;
-		console.log('XXX', disallowed);
 		if (loading) return <LWSLoading />;
 		return (
 			<LWSRequiredInfo

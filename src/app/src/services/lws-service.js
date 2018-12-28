@@ -40,12 +40,12 @@ export class LWSService {
 		});
 	}
 
-	getAttributes(publicKey, attributes) {
+	getAttributes(publicKey, requestedAttributes) {
 		return this.sendRequest({
 			type: 'attributes',
 			payload: {
 				publicKey,
-				attributes
+				requestedAttributes
 			}
 		});
 	}
@@ -58,9 +58,19 @@ export class LWSService {
 		});
 	}
 
-	sendAuth(config, publicKey, attributes) {
+	sendAuth(config, publicKey) {
 		return this.sendRequest({
 			type: 'auth',
+			payload: {
+				config,
+				publicKey
+			}
+		});
+	}
+
+	sendSignup(config, publicKey, attributes) {
+		return this.sendRequest({
+			type: 'signup',
 			payload: {
 				config,
 				publicKey,
