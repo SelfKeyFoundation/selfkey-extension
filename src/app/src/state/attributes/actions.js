@@ -11,9 +11,9 @@ const setAttributesLoading = loading => ({
 	payload: loading
 });
 
-const disallowAttributes = (key, disallow) => ({
+const disallowAttributes = (url, disallow) => ({
 	type: types.ATTRIBUTES_DISALLOW,
-	payload: { key, disallow }
+	payload: { url, disallow }
 });
 
 export { updateAttributes, setAttributesLoading, disallowAttributes };

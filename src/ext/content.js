@@ -43,7 +43,7 @@ function handleWebPageMessage(evt) {
 	if (window !== evt.source) return;
 	if (!msg || !msg.type || !msg.meta || msg.meta.src !== WP_SRC) return;
 
-	msg.payload.meta.origin = window.location;
+	msg.payload.origin = window.location.origin;
 
 	switch (msg.type) {
 		case 'wp_init':

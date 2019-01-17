@@ -3,7 +3,7 @@ import * as types from './types';
 const initialState = {
 	list: [],
 	disallowed: [],
-	byKey: {},
+	byUrl: {},
 	loading: true
 };
 
@@ -13,8 +13,8 @@ const updateAttributesReducer = (state, { payload, error }) => {
 	}
 	let attributesState = (payload || []).reduce(
 		(acc, attr) => {
-			acc.list = [...acc.list, attr.key];
-			acc.byKey = { ...acc.byKey, [attr.key]: attr };
+			acc.list = [...acc.list, attr.url];
+			acc.byUrl = { ...acc.byUrl, [attr.url]: attr };
 			return acc;
 		},
 		{ ...initialState }
@@ -23,15 +23,15 @@ const updateAttributesReducer = (state, { payload, error }) => {
 };
 
 const disallowAttributeReducer = (state, { payload }) => {
-	let { key, disallow } = payload;
-	let indx = state.disallowed.indexOf(key);
+	let { url, disallow } = payload;
+	let indx = state.disallowed.indexOf(url);
 	if ((indx >= 0 && disallow) || (indx < 0 && !disallow)) {
 		return state;
 	}
 	if (disallow) {
-		return { ...state, disallowed: [...state.disallowed, key] };
+		return { ...state, disallowed: [...state.disallowed, url] };
 	}
-	return { ...state, disallowed: state.disallowed.filter(k => k !== key) };
+	return { ...state, disallowed: state.disallowed.filter(u => u !== url) };
 };
 
 const attributesReducer = (state = initialState, action) => {

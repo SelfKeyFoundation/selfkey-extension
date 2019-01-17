@@ -3,7 +3,16 @@
 const WS_URL = 'ws://localhost:8898';
 const CONTENT_PORT_NAME = 'LWS_CONTENT';
 const APP_PORT_NAME = 'LWS_APP';
-const ALLOWED_REQUESTS = ['wp_init', 'app_init', 'wallets', 'unlock', 'attributes', 'auth'];
+const ALLOWED_REQUESTS = [
+	'wp_init',
+	'wp_auth',
+	'app_init',
+	'wallets',
+	'unlock',
+	'attributes',
+	'auth',
+	'signup'
+];
 const MSG_SRC = 'bg';
 const WS_REQ_TIMEOUT = 5000;
 const WS_RECONNECT_INTERVAL = 5000;
@@ -66,9 +75,6 @@ const handleWSMessage = ctx => evt => {
 		console.log('unknown message', msg);
 	}
 	req.handleRes(msg);
-	if (msg.type === 'auth' && req.ctx.port) {
-		req.ctx.port.postMessage(fmtMessage({ type: 'wp_auth', payload: msg.payload }, msg));
-	}
 };
 
 const handleWSClose = ctx => () => {
@@ -107,6 +113,33 @@ const genConnHash = () => {
 	return Math.random();
 };
 
+const validateConfig = config => {
+	const { website, rootEndpoint, endpoints, origin } = config;
+	if (!website) throw new Error('Config object does not contain website options');
+	let { name, url } = website;
+	if (!name || typeof name !== 'string') {
+		throw new Error('Website name is required');
+	}
+	if (!url || typeof url !== 'string') {
+		throw new Error('Website url is required');
+	}
+	try {
+		url = new URL(url);
+	} catch (error) {
+		throw new Error('Website url is invalid');
+	}
+	if (!origin || typeof origin !== 'string') {
+		throw new Error('Website origin is required');
+	}
+	if (origin !== url.origin) {
+		throw new Error('Website origin and url do not mach');
+	}
+	if (!rootEndpoint && !endpoints) {
+		throw new Error('API endpoint must be provided');
+	}
+	return true;
+};
+
 const handlePortMessage = ctx => async (msg, port) => {
 	const sendResponse = (msg, req) => port.postMessage(fmtMessage(msg, req));
 	let wsMessage = fmtMessage({ payload: msg.payload }, msg);
@@ -124,11 +157,25 @@ const handlePortMessage = ctx => async (msg, port) => {
 		);
 		return;
 	} else if (msg.type === 'wp_init') {
-		ctx.config = msg.payload;
+		let config = msg.payload;
+		try {
+			validateConfig(config);
+		} catch (error) {
+			return sendResponse(
+				{ error: true, payload: { code: 'invalid_config', message: error.message } },
+				msg
+			);
+		}
+		ctx.config = config;
 		return sendResponse({ payload: ctx.hash }, msg);
 	} else if (msg.type === 'app_init') {
 		console.log('init from app', ctx);
 		return sendResponse({ payload: ctx.config }, msg);
+	} else if (msg.type === 'wp_auth') {
+		if (port === ctx.port) return null;
+		ctx.port.postMessage(fmtMessage(msg));
+		sendResponse({ payload: 'ok' }, msg);
+		return;
 	}
 
 	if (!bg.ws || bg.ws.readyState !== 1) {

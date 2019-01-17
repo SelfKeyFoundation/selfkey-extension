@@ -25,7 +25,8 @@
     "homepage": "https://github.com/SelfKeyFoundation/selfkey-extension#readme",
     "dependencies": {
         "awilix": "^3.0.9",
-        "redux-thunk": "^2.3.0"
+        "redux-thunk": "^2.3.0",
+        "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#1354e71e1f164d4225a5964bd63d12d03d5e1d61"
     },
     "scripts": {
         "test": "echo 'please implement tests'",

@@ -12,7 +12,7 @@ const loadAttributes = () => async (dispatch, getState) => {
 	try {
 		await dispatch(actions.setAttributesLoading(true));
 		let attributes = await ctx.lwsService.getAttributes(wallet.publicKey, config.attributes);
-		await dispatch(actions.updateAttributes(attributes.payload));
+		await dispatch(actions.updateAttributes(attributes.payload.attributes));
 	} catch (error) {
 		await dispatch(actions.updateAttributes(error.payload, true));
 		if (!error.payload) {
@@ -41,10 +41,13 @@ const authWithAttrs = () => async (dispatch, getState) => {
 
 	try {
 		await dispatch(actions.setAttributesLoading(true));
-		await ctx.lwsService.sendAuth(config.website, wallet.publicKey, attributes);
+		await ctx.lwsService.sendSignup(config, wallet.publicKey, attributes);
+		let authResp = await ctx.lwsService.sendAuth(config, wallet.publicKey);
+		await ctx.lwsService.sendWPAuth(authResp.payload, authResp.error);
 		await dispatch(push(`${config.hash}/auth/success`));
 	} catch (error) {
 		console.log('auth error', error);
+		await ctx.lwsService.sendWPAuth(error.payload || {}, true);
 		await dispatch(walletsOperations.selectWallet(null));
 		await dispatch(actions.updateAttributes(null));
 		await dispatch(push(`${config.hash}/auth/failed`));
