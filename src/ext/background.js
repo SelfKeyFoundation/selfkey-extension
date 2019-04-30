@@ -237,7 +237,20 @@ const handleConnection = port => {
 	});
 };
 
+const injectContentScript = () => {
+	console.log('LWS: injecting content script on start');
+	chrome.tabs.query({}, tabs => {
+		tabs.forEach(tab => {
+			chrome.tabs.executeScript(tab.id, {
+				file: '/content.js',
+				runAt: 'document_start'
+			});
+		});
+	});
+};
+
 const main = () => {
+	injectContentScript();
 	initWS();
 	chrome.runtime.onConnect.addListener(handleConnection);
 };
