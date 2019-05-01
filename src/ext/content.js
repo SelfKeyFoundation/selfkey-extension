@@ -68,6 +68,8 @@
 				return handleTearDownFromBg(msg);
 			case 'wp_auth':
 				return handleAuthFromBg(msg);
+			case 'error':
+				return handleErrorFromBg(msg);
 		}
 	}
 
@@ -154,6 +156,16 @@
 			};
 		}
 		sendToWindow(winMsg, msg);
+	}
+
+	function handleErrorFromBg(msg) {
+		if (
+			msg.error &&
+			msg.payload.code === 'idw_disconnect' &&
+			msg.payload.disconnectCounter === 1
+		) {
+			return sendToWindow({ type: 'idw_disconnect' });
+		}
 	}
 
 	function main() {
