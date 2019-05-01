@@ -37,6 +37,7 @@
 			console.error('bg port disconnected');
 			contentScript.bgPort.onMessage.removeListener(handleBgMessage);
 			window.removeEventListener('message', handleWebPageMessage);
+			sendToWindow({ type: 'content_disconnect' });
 		});
 		window.addEventListener('message', handleWebPageMessage, false);
 	}
