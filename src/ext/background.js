@@ -22,7 +22,8 @@ const bg = {
 	ports: [],
 	ws: null,
 	wsReqs: {},
-	conns: {}
+	conns: {},
+	disconnectCounter: 0
 };
 
 // TODO: handle ws disconnects and reconnects
@@ -78,11 +79,16 @@ const handleWSMessage = ctx => evt => {
 };
 
 const handleWSClose = ctx => () => {
-	console.log('ws connection closed');
+	bg.disconnectCounter++;
+	console.log('ws connection closed, attempt:', bg.disconnectCounter + 1);
 	sendToAllPorts(
 		fmtMessage({
 			error: true,
-			payload: { code: 'idw_disconnect', message: 'IDW disconnected' }
+			payload: {
+				code: 'idw_disconnect',
+				message: 'IDW disconnected',
+				disconnectCounter: bg.disconnectCounter
+			}
 		})
 	);
 	bg.ws = null;
@@ -94,6 +100,7 @@ const handleWSClose = ctx => () => {
 
 const handleWSOpen = ctx => () => {
 	console.log('ws connection established');
+	bg.disconnectCounter = 0;
 };
 
 const handleWSError = () => evt => {
@@ -216,7 +223,6 @@ const genConnContext = port => {
 
 const handleConnection = port => {
 	console.assert(port.name === CONTENT_PORT_NAME || port.name.startsWith(APP_PORT_NAME));
-
 	console.log('port connected', port.name);
 	bg.ports.push(port);
 	const ctx = genConnContext(port);
@@ -237,7 +243,20 @@ const handleConnection = port => {
 	});
 };
 
+const injectContentScript = () => {
+	console.log('LWS: injecting content script on start');
+	chrome.tabs.query({}, tabs => {
+		tabs.forEach(tab => {
+			chrome.tabs.executeScript(tab.id, {
+				file: '/content.js',
+				runAt: 'document_start'
+			});
+		});
+	});
+};
+
 const main = () => {
+	injectContentScript();
 	initWS();
 	chrome.runtime.onConnect.addListener(handleConnection);
 };

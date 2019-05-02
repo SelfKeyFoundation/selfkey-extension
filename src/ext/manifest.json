@@ -6,7 +6,8 @@
     "description": "SelfKey Connect Browser Extension for Chrome",
     "permissions": [
         "storage",
-        "tabs"
+		"tabs",
+		"<all_urls>"
     ],
     "icons": {
         "16": "img/16x16.png",
