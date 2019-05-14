@@ -14,8 +14,6 @@ import { Router, Route } from 'react-router';
 import { Provider as ReduxProvider } from 'react-redux';
 import { setGlobalContext, configureContext } from './context';
 
-// import { LWSLoading } from './views/components/lws-loading';
-
 const ctx = configureContext(window.REDUX_INITIAL_DATA).cradle;
 setGlobalContext(ctx);
 
@@ -35,17 +33,5 @@ const RootHtml = () => (
 		</ReduxProvider>
 	</SelfkeyDarkTheme>
 );
-
-// const TestComponent = () => <LWSLoading />;
-
-// const RootHtml = () => (
-// 	<SelfkeyDarkTheme>
-// 		<ReduxProvider store={ctx.store}>
-// 			<Router history={ctx.reduxHistory}>
-// 				<Route path="/" component={TestComponent} />
-// 			</Router>
-// 		</ReduxProvider>
-// 	</SelfkeyDarkTheme>
-// );
 
 ReactDOM.render(<RootHtml />, document.getElementById('root'));

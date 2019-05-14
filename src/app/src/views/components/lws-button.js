@@ -1,5 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core';
+import classNames from 'classnames';
 
 const styles = theme => ({
 	root: {
@@ -15,6 +16,55 @@ const styles = theme => ({
 		fontFamily: 'Lato, arial, sans-serif',
 		letterSpacing: '0.6px',
 		cursor: 'pointer'
+	},
+
+	buttonPrimary: {
+		fontFamily: 'Lato, arial, sans-serif',
+		color: '#fff',
+		background: 'linear-gradient(0deg, #09A8BA 0%, #0ABBD0 100%)',
+		border: 0,
+		width: '100%',
+		'&:hover': {
+			background: 'linear-gradient(45deg, #09A8BA 0%, #0ABBD0 100%)'
+		}
+	},
+
+	buttonSecondary: {
+		fontFamily: 'Lato, arial, sans-serif',
+		marginTop: '30px',
+		color: '#1CA9BA',
+		background: '#202A33',
+		border: '2px solid #1CA9BA',
+		width: '100%',
+		'&:hover': {
+			background: '#293743'
+		}
+	},
+	buttonTertiary: {
+		height: '80px',
+		padding: '20px',
+		boxSizing: 'border-box',
+		border: '1px solid #1D505F',
+		borderRadius: '4px',
+		background: '#293743',
+		color: '#fff',
+		fontSize: '16px',
+		display: 'flex',
+		alignItems: 'center',
+		'&:hover': {
+			cursor: 'pointer',
+			background: '#374a5a'
+		},
+		'& svg': {
+			padding: '0px 15px 0px 0px'
+		},
+		fontFamily: 'Lato, arial, sans-serif',
+		fontWeight: 700,
+		maxWidth: 'calc(50% - 15px)',
+		width: '100%'
+	},
+	buttonTertiarySelected: {
+		border: `2px solid #1CA9BA`
 	}
 });
 
@@ -23,5 +73,34 @@ export const LWSButton = withStyles(styles)(({ classes, children, className, onC
 		{children}
 	</button>
 ));
+
+export const LWSButtonTertiary = withStyles(styles)(
+	({ classes, children, className, onClick, selected = false }) => (
+		<button
+			className={classNames(
+				classes.buttonTertiary,
+				selected ? classes.buttonTertiarySelected : null,
+				className
+			)}
+			onClick={onClick}
+		>
+			{children}
+		</button>
+	)
+);
+
+export const LWSButtonPrimary = withStyles(styles)(({ classes, children, className, onClick }) => (
+	<LWSButton className={`${classes.buttonPrimary} ${className}`} onClick={onClick}>
+		{children}
+	</LWSButton>
+));
+
+export const LWSButtonSecondary = withStyles(styles)(
+	({ classes, children, className, onClick }) => (
+		<LWSButton className={`${classes.buttonSecondary} ${className}`} onClick={onClick}>
+			{children}
+		</LWSButton>
+	)
+);
 
 export default LWSButton;

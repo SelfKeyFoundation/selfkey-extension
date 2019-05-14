@@ -2,37 +2,12 @@ import React from 'react';
 import _ from 'lodash';
 import { withStyles } from '@material-ui/core';
 import { CheckIcon, CheckEmptyIcon, EditTransparentIcon, AttributeAlertIcon } from 'selfkey-ui';
-import { LWSButton } from './lws-button';
+import { LWSButtonPrimary, LWSButtonSecondary } from './lws-button';
 
 const styles = theme => ({
 	form: {
 		minHeight: '300px'
 	},
-	buttonPrimary: {
-		fontFamily: 'Lato, arial, sans-serif',
-		color: '#fff',
-		background: 'linear-gradient(0deg, #09A8BA 0%, #0ABBD0 100%)',
-		border: 0,
-		width: '100%',
-		'&:hover': {
-			background: 'linear-gradient(45deg, #09A8BA 0%, #0ABBD0 100%)'
-		},
-		fontWeight: 700
-	},
-
-	buttonSecondary: {
-		fontFamily: 'Lato, arial, sans-serif',
-		marginTop: '30px',
-		color: '#1CA9BA',
-		background: '#202A33',
-		border: '2px solid #1CA9BA',
-		width: '100%',
-		'&:hover': {
-			background: '#293743'
-		},
-		fontWeight: 700
-	},
-
 	requiredInfo: {
 		'& a': {
 			color: '#23E6FE',
@@ -232,12 +207,8 @@ export const LWSRequiredInfo = withStyles(styles)(
 					.
 				</div>
 				<div className={classes.formSubmitColumn}>
-					<LWSButton className={classes.buttonSecondary} onClick={cancelAction}>
-						Cancel
-					</LWSButton>
-					<LWSButton className={classes.buttonPrimary} onClick={allowAction}>
-						Allow
-					</LWSButton>
+					<LWSButtonSecondary onClick={cancelAction}>Cancel</LWSButtonSecondary>
+					<LWSButtonPrimary onClick={allowAction}>Allow</LWSButtonPrimary>
 				</div>
 			</div>
 		</div>

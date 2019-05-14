@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "/app/",
   "dependencies": {
+    "classnames": "^2.2.6",
     "lodash": "^4.17.10",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
@@ -16,6 +17,12 @@
     "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#4c1fad880a88b6291c3e056c7fa2acef44476104"
   },
   "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@storybook/addon-actions": "^5.0.11",
+    "@storybook/addon-links": "^5.0.11",
+    "@storybook/addons": "^5.0.11",
+    "@storybook/react": "^5.0.11",
+    "babel-loader": "^8.0.6",
     "eslint": "^4.17.0",
     "eslint-config-prettier": "^2.8.0",
     "eslint-config-standard": "^11.0.0-beta.0",
@@ -25,13 +32,7 @@
     "eslint-plugin-prettier": "^2.3.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-react": "^7.11.1",
-    "eslint-plugin-standard": "^3.0.1",
-    "@storybook/react": "^5.0.11",
-    "@storybook/addon-actions": "^5.0.11",
-    "@storybook/addon-links": "^5.0.11",
-    "@storybook/addons": "^5.0.11",
-    "@babel/core": "^7.4.4",
-    "babel-loader": "^8.0.6"
+    "eslint-plugin-standard": "^3.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

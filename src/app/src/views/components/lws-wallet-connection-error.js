@@ -1,6 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core';
-import { LWSButton } from './lws-button';
+import { LWSButtonPrimary } from './lws-button';
 import { WalletIcon } from 'selfkey-ui';
 import { LWSError } from './lws-error';
 
@@ -40,12 +40,12 @@ export const LWSWalletConnectionError = withStyles(styles)(
 			supportText="The SelfKey Identity Wallet is required to securely authenticate with this website. Please download and open the SelfKey Identity Wallet to proceed."
 			actionButton={
 				<div>
-					<LWSButton className={classes.buttonPrimary} onClick={downloadWalletAction}>
+					<LWSButtonPrimary onClick={downloadWalletAction}>
 						Download The SelfKey Wallet
-					</LWSButton>
-					<LWSButton className={classes.buttonSecondary} onClick={retryAction}>
+					</LWSButtonPrimary>
+					<LWSButtonPrimary className={classes.buttonSecondary} onClick={retryAction}>
 						Retry
-					</LWSButton>
+					</LWSButtonPrimary>
 				</div>
 			}
 		/>

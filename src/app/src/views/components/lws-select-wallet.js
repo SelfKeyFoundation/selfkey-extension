@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import { IDIcon, ProfileIcon, StickIcon } from 'selfkey-ui';
-import { LWSButton } from './lws-button';
+import { LWSButtonPrimary, LWSButtonTertiary } from './lws-button';
 import { Typography, withStyles } from '@material-ui/core';
 
 export const styles = theme => ({
@@ -41,30 +41,6 @@ export const styles = theme => ({
 		justifyContent: 'space-between'
 	},
 
-	buttonTertiary: {
-		height: '80px',
-		padding: '20px',
-		boxSizing: 'border-box',
-		border: '1px solid #1D505F',
-		borderRadius: '4px',
-		background: '#293743',
-		color: '#fff',
-		fontSize: '16px',
-		display: 'flex',
-		alignItems: 'center',
-		'&:hover': {
-			cursor: 'pointer',
-			background: '#374a5a'
-		},
-		'& svg': {
-			padding: '0px 15px 0px 0px'
-		},
-		fontFamily: 'Lato, arial, sans-serif',
-		fontWeight: 700,
-		maxWidth: 'calc(50% - 15px)',
-		width: '100%'
-	},
-
 	formControl: {
 		width: '100%',
 		background: '#202A33',
@@ -84,43 +60,6 @@ export const styles = theme => ({
 
 	formSubmitRow: {
 		marginTop: '15px'
-	},
-
-	button: {
-		fontSize: '14px',
-		lineHeight: '20px',
-		padding: '10px',
-		height: '50px',
-		fontWeight: 700
-	},
-
-	buttonPrimary: {
-		fontFamily: 'Lato, arial, sans-serif',
-		color: '#fff',
-		background: 'linear-gradient(0deg, #09A8BA 0%, #0ABBD0 100%)',
-		border: 0,
-		width: '100%',
-		'&:hover': {
-			background: 'linear-gradient(45deg, #09A8BA 0%, #0ABBD0 100%)'
-		},
-		fontWeight: 700
-	},
-
-	buttonSecondary: {
-		fontFamily: 'Lato, arial, sans-serif',
-		marginTop: '30px',
-		color: '#1CA9BA',
-		background: '#202A33',
-		border: '2px solid #1CA9BA',
-		width: '100%',
-		'&:hover': {
-			background: '#293743'
-		},
-		fontWeight: 700
-	},
-
-	selected: {
-		border: `2px solid #1CA9BA`
 	},
 
 	supportText: {
@@ -280,9 +219,7 @@ class LWSSelectWalletComponent extends Component {
 						</div>
 					)}
 					<div className={classes.formSubmitRow}>
-						<LWSButton className={classes.buttonPrimary} onClick={() => this.login()}>
-							Log in
-						</LWSButton>
+						<LWSButtonPrimary onClick={() => this.login()}>Log in</LWSButtonPrimary>
 					</div>
 				</div>
 			);
@@ -302,22 +239,18 @@ class LWSSelectWalletComponent extends Component {
 				</div>
 				<div className={classes.form}>
 					<div className={`${classes.formGroup} ${classes.radioReplace}`}>
-						<button
-							className={`${classes.buttonTertiary} ${
-								!isHardwareWallet ? classes.selected : ''
-							}`}
+						<LWSButtonTertiary
+							selected={!isHardwareWallet}
 							onClick={() => this.toggleIsHardwallet(false)}
 						>
 							<ProfileIcon /> <span>ETH Address</span>
-						</button>
-						<button
-							className={`${classes.buttonTertiary} ${
-								isHardwareWallet ? classes.selected : ''
-							}`}
+						</LWSButtonTertiary>
+						<LWSButtonTertiary
+							selected={isHardwareWallet}
 							onClick={() => this.toggleIsHardwallet(true)}
 						>
 							<StickIcon /> <span>Trezor/Ledger</span>
-						</button>
+						</LWSButtonTertiary>
 					</div>
 					{this.renderSelection()}
 				</div>
