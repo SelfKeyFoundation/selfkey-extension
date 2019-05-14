@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { LWSWalletConnectionError } from 'selfkey-ui';
+import { LWSWalletConnectionError } from '../components';
 class ErrorNoIDWContainer extends Component {
 	retryAction = evt => {
 		evt.preventDefault();

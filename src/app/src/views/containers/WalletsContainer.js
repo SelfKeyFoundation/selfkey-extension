@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { walletsOperations, walletsSelectors } from '../../state/wallets';
-import { LWSSelectWallet, LWSLoading } from 'selfkey-ui';
+import { LWSSelectWallet, LWSLoading } from '../components';
 
 class WalletsContainer extends Component {
 	componentDidMount() {

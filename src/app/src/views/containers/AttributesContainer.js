@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { LWSRequiredInfo, LWSLoading } from 'selfkey-ui';
+import { LWSRequiredInfo, LWSLoading } from '../components';
 import { attributesSelectors, attributesOperations } from '../../state/attributes';
 import { appSelectors } from '../../state/app';
 class AttributesContainer extends Component {
