@@ -933,7 +933,7 @@
     "@emotion/utils" "0.11.1"
     "@emotion/weak-memoize" "0.2.2"
 
-"@emotion/core@^10.0.7":
+"@emotion/core@^10.0.10", "@emotion/core@^10.0.7":
   version "10.0.10"
   resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.10.tgz#8d3114e5a2f8b178a7067c603a2937516f180b08"
   integrity sha512-U1aE2cOWUscjc8ZJ3Cx32udOzLeRoJwGxBH93xQD850oQFpwPKZARzdUtdc9SByUOwzSFYxhDhrpXnV34FJmWg==
@@ -986,6 +986,14 @@
   resolved "https://registry.yarnpkg.com/@emotion/sheet/-/sheet-0.9.2.tgz#74e5c6b5e489a1ba30ab246ab5eedd96916487c4"
   integrity sha512-pVBLzIbC/QCHDKJF2E82V2H/W/B004mDFQZiyo/MSR+VC4pV5JLG0TF/zgQDFvP3fZL/5RTPGEmXlYJBMUuJ+A==
 
+"@emotion/style@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@emotion/style/-/style-0.8.0.tgz#0130c5d8f2999be509e4fa8a8a9dc6a25e6443e9"
+  integrity sha1-ATDF2PKZm+UJ5PqKip3Gol5kQ+k=
+  dependencies:
+    "@emotion/types" "^0.6.2"
+    "@emotion/utils" "^0.6.1"
+
 "@emotion/styled-base@^10.0.10":
   version "10.0.10"
   resolved "https://registry.yarnpkg.com/@emotion/styled-base/-/styled-base-10.0.10.tgz#ffb811295c9dcd9b3c12bf93301d7d8bcb02e6f4"
@@ -1009,6 +1017,11 @@
   resolved "https://registry.yarnpkg.com/@emotion/stylis/-/stylis-0.8.3.tgz#3ca7e9bcb31b3cb4afbaeb66156d86ee85e23246"
   integrity sha512-M3nMfJ6ndJMYloSIbYEBq6G3eqoYD41BpDOxreE8j0cb4fzz/5qvmqU9Mb2hzsXcCnIlGlWhS03PCzVGvTAe0Q==
 
+"@emotion/types@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@emotion/types/-/types-0.6.2.tgz#ca3bd5053b9c0004982fed816f4c7ad9cdb4c423"
+  integrity sha1-yjvVBTucAASYL+2Bb0x62c20xCM=
+
 "@emotion/unitless@0.7.3":
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/@emotion/unitless/-/unitless-0.7.3.tgz#6310a047f12d21a1036fb031317219892440416f"
@@ -1018,6 +1031,11 @@
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/@emotion/utils/-/utils-0.11.1.tgz#8529b7412a6eb4b48bdf6e720cc1b8e6e1e17628"
   integrity sha512-8M3VN0hetwhsJ8dH8VkVy7xo5/1VoBsDOk/T4SJOeXwTO1c4uIqVNx2qyecLFnnUWD5vvUqHQ1gASSeUN6zcTg==
+
+"@emotion/utils@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@emotion/utils/-/utils-0.6.1.tgz#f657657b9db639e9f91fcb81284601f2e8e09df2"
+  integrity sha1-9ldle522Oen5H8uBKEYB8ujgnfI=
 
 "@emotion/weak-memoize@0.2.2":
   version "0.2.2"
@@ -10870,9 +10888,9 @@ select@^1.1.2:
   resolved "https://registry.yarnpkg.com/select/-/select-1.1.2.tgz#0e7350acdec80b1108528786ec1d4418d11b396d"
   integrity sha1-DnNQrN7ICxEIUoeG7B1EGNEbOW0=
 
-"selfkey-ui@https://github.com/SelfKeyFoundation/selfkey-ui.git#4c1fad880a88b6291c3e056c7fa2acef44476104":
+"selfkey-ui@https://github.com/SelfKeyFoundation/selfkey-ui.git#6e1598f7396498f04a44557e14836c72e40eed7e":
   version "1.0.0"
-  resolved "https://github.com/SelfKeyFoundation/selfkey-ui.git#4c1fad880a88b6291c3e056c7fa2acef44476104"
+  resolved "https://github.com/SelfKeyFoundation/selfkey-ui.git#6e1598f7396498f04a44557e14836c72e40eed7e"
   dependencies:
     "@material-ui/core" "3.9.2"
     "@material-ui/icons" "3.0.2"

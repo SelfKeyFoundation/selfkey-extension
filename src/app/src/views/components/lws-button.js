@@ -42,7 +42,7 @@ const styles = theme => ({
 	},
 	buttonTertiary: {
 		height: '80px',
-		padding: '20px',
+		padding: '10px',
 		boxSizing: 'border-box',
 		border: '1px solid #1D505F',
 		borderRadius: '4px',
@@ -51,16 +51,17 @@ const styles = theme => ({
 		fontSize: '16px',
 		display: 'flex',
 		alignItems: 'center',
+		flexFlow: 'column',
 		'&:hover': {
 			cursor: 'pointer',
 			background: '#374a5a'
 		},
 		'& svg': {
-			padding: '0px 15px 0px 0px'
+			padding: '0px 0px 10px 0px'
 		},
 		fontFamily: 'Lato, arial, sans-serif',
 		fontWeight: 700,
-		maxWidth: 'calc(50% - 15px)',
+		maxWidth: 'calc(33% - 15px)',
 		width: '100%'
 	},
 	buttonTertiarySelected: {

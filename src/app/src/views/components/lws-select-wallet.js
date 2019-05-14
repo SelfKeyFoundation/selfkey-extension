@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import { IDIcon, ProfileIcon, StickIcon } from 'selfkey-ui';
+import { IDIcon, ProfileIcon, LedgerIcon, TrezorIcon } from 'selfkey-ui';
 import { LWSButtonPrimary, LWSButtonTertiary } from './lws-button';
 import { Typography, withStyles } from '@material-ui/core';
 
@@ -91,7 +91,7 @@ class LWSSelectWalletComponent extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			isHardwareWallet: false,
+			view: 'eth',
 			wallet: null,
 			password: ''
 		};
@@ -109,8 +109,8 @@ class LWSSelectWalletComponent extends Component {
 		}
 	}
 
-	toggleIsHardwallet(isHardwareWallet) {
-		return this.setState({ isHardwareWallet });
+	setView(view) {
+		return this.setState({ view });
 	}
 
 	selectWallet(publicKey) {
@@ -172,9 +172,9 @@ class LWSSelectWalletComponent extends Component {
 
 	renderSelection() {
 		const { classes, passwordError, wallets } = this.props;
-		const { wallet, password, isHardwareWallet } = this.state;
+		const { wallet, password, view } = this.state;
 		const publicKey = wallet ? wallet.publicKey : '';
-		if (isHardwareWallet) {
+		if (view !== 'eth') {
 			return this.renderHardwareWallet();
 		} else {
 			return (
@@ -228,7 +228,7 @@ class LWSSelectWalletComponent extends Component {
 
 	render() {
 		const { classes } = this.props;
-		const { isHardwareWallet } = this.state;
+		const { view } = this.state;
 		return (
 			<div>
 				<div className={classes.areaTitle}>
@@ -240,16 +240,23 @@ class LWSSelectWalletComponent extends Component {
 				<div className={classes.form}>
 					<div className={`${classes.formGroup} ${classes.radioReplace}`}>
 						<LWSButtonTertiary
-							selected={!isHardwareWallet}
-							onClick={() => this.toggleIsHardwallet(false)}
+							selected={view === 'eth'}
+							onClick={() => this.setView('eth')}
 						>
-							<ProfileIcon /> <span>ETH Address</span>
+							<ProfileIcon width="28px" height="25px" />
+							<span>ETH Address</span>
 						</LWSButtonTertiary>
 						<LWSButtonTertiary
-							selected={isHardwareWallet}
-							onClick={() => this.toggleIsHardwallet(true)}
+							selected={view === 'ledger'}
+							onClick={() => this.setView('ledger')}
 						>
-							<StickIcon /> <span>Trezor/Ledger</span>
+							<LedgerIcon /> <span>Ledger</span>
+						</LWSButtonTertiary>
+						<LWSButtonTertiary
+							selected={view === 'trezor'}
+							onClick={() => this.setView('trezor')}
+						>
+							<TrezorIcon /> <span>Trezor</span>
 						</LWSButtonTertiary>
 					</div>
 					{this.renderSelection()}
