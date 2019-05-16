@@ -4,6 +4,7 @@ import { IDIcon, ProfileIcon, LedgerIcon, TrezorIcon } from 'selfkey-ui';
 import { LWSButtonPrimary, LWSButtonTertiary } from './lws-button';
 import { Typography, withStyles } from '@material-ui/core';
 import { LedgerConnect } from './ledger/connect';
+import { TrezorConnect } from './trezor';
 
 export const styles = theme => ({
 	areaTitle: {
@@ -153,12 +154,7 @@ class LWSSelectWalletComponent extends Component {
 	}
 
 	renderTrezor() {
-		const { classes } = this.props;
-		return (
-			<div>
-				<p className={classes.supportText}>Ledger and Trezor support is coming soon</p>
-			</div>
-		);
+		return <TrezorConnect onConnectClick={this.props.onTrezorConnect} />;
 	}
 
 	renderSelection() {

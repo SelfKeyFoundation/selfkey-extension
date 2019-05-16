@@ -121,6 +121,7 @@ storiesOf('Unlock', module)
 				]}
 				loginAction={action('login clicked')}
 				onLedgerConnect={action('ledger connect clicked')}
+				onTrezorConnect={action('trezor connect clicked')}
 			/>
 		</WithTheme>
 	))
