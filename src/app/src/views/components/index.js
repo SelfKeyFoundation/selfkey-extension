@@ -1,5 +1,7 @@
 export { LWSAuthError } from './lws-auth-error';
 export * from './lws-button';
+export * from './ledger';
+export * from './trezor';
 export { LWSError } from './lws-error';
 export { LWSLoading } from './lws-loading';
 export { LWSRequiredInfo } from './lws-required-info';

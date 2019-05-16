@@ -17,7 +17,19 @@ import {
 	LWSSelectWallet,
 	LWSSelfkeyIdError,
 	LWSSuccess,
-	LWSWalletConnectionError
+	LWSWalletConnectionError,
+	LedgerHelpStepsSection,
+	LedgerHelpStepsErrorSection,
+	LedgerConnect,
+	LedgerConnecting,
+	LedgerConnectionError,
+	TrezorHelpStepsSection,
+	TrezorConnect,
+	TrezorConnecting,
+	TrezorBridgeNotFoundError,
+	TrezorConnectionError,
+	TrezorEnterPassprase,
+	TrezorEnterPin
 } from '../src/views/components';
 
 const WithTheme = ({ children }) => <SelfkeyDarkTheme>{children}</SelfkeyDarkTheme>;
@@ -108,12 +120,148 @@ storiesOf('Unlock', module)
 					}
 				]}
 				loginAction={action('login clicked')}
+				onLedgerConnect={action('ledger connect clicked')}
 			/>
 		</WithTheme>
 	))
 	.add('Id Error', () => (
 		<WithTheme>
 			<LWSSelfkeyIdError />
+		</WithTheme>
+	));
+
+storiesOf('Ledger', module)
+	.add('Help Steps section', () => (
+		<WithTheme>
+			<LedgerHelpStepsSection />
+		</WithTheme>
+	))
+	.add('Help Steps section error', () => (
+		<WithTheme>
+			<LedgerHelpStepsErrorSection />
+		</WithTheme>
+	))
+	.add('Connect', () => (
+		<WithTheme>
+			<LedgerConnect onConnectClick={action('ledger connect click')} />
+		</WithTheme>
+	))
+	.add('Connecting', () => (
+		<WithTheme>
+			<LedgerConnecting handleBack={action('ledger connecting back click')} />
+		</WithTheme>
+	))
+	.add('Connection Error', () => (
+		<WithTheme>
+			<LedgerConnectionError
+				handleRetry={action('ledger connection error retry click')}
+				handleBack={action('ledger connection error back click')}
+			/>
+		</WithTheme>
+	));
+
+storiesOf('Trezor', module)
+	.add('Help Steps section', () => (
+		<WithTheme>
+			<TrezorHelpStepsSection />
+		</WithTheme>
+	))
+	.add('Connect', () => (
+		<WithTheme>
+			<TrezorConnect onConnectClick={action('trezor connect click')} />
+		</WithTheme>
+	))
+	.add('Connection error', () => (
+		<WithTheme>
+			<TrezorConnectionError
+				onRetry={action('trezor connection error retry')}
+				onBack={action('trezor connection error back')}
+			/>
+		</WithTheme>
+	))
+	.add('Connecting', () => (
+		<WithTheme>
+			<TrezorConnecting onBack={action('trezor connecting back')} />
+		</WithTheme>
+	))
+	.add('Bridge not found error', () => (
+		<WithTheme>
+			<TrezorBridgeNotFoundError
+				onRetry={action('trezor bridge retry')}
+				onBack={action('trezor bridge back')}
+			/>
+		</WithTheme>
+	));
+
+storiesOf('Trezor/Enter Pin')
+	.add('default', () => (
+		<WithTheme>
+			<TrezorEnterPin
+				onEnter={action('trezor pin enter')}
+				onBack={action('trezor pin back')}
+				onPinClick={action('trezor pin click')}
+				onClear={action('trezor pin clear')}
+			/>
+		</WithTheme>
+	))
+	.add('value', () => (
+		<WithTheme>
+			<TrezorEnterPin
+				onEnter={action('trezor pin enter')}
+				onBack={action('trezor pin back')}
+				onPinClick={action('trezor pin click')}
+				onClear={action('trezor pin clear')}
+				pin="12324"
+			/>
+		</WithTheme>
+	))
+
+	.add('error', () => (
+		<WithTheme>
+			<TrezorEnterPin
+				onEnter={action('trezor pin enter')}
+				onBack={action('trezor pin back')}
+				onPinClick={action('trezor pin click')}
+				onClear={action('trezor pin clear')}
+				error="Super Error"
+			/>
+		</WithTheme>
+	));
+
+storiesOf('Trezor/Enter Password')
+	.add('default', () => (
+		<WithTheme>
+			<TrezorEnterPassprase
+				onEnter={action('trezor passprasse enter')}
+				onBack={action('trezor passprasse back')}
+				onPasspraseChange={action('trezor passprasse change')}
+				onRePasspraseChange={action('trezor passprasse repeat change')}
+				onVisibility={action('trezor passprasse visibility change')}
+			/>
+		</WithTheme>
+	))
+	.add('visibility', () => (
+		<WithTheme>
+			<TrezorEnterPassprase
+				onEnter={action('trezor passprasse enter')}
+				onBack={action('trezor passprasse back')}
+				onPasspraseChange={action('trezor passprasse change')}
+				onRePasspraseChange={action('trezor passprasse repeat change')}
+				onVisibility={action('trezor passprasse visibility change')}
+				visibility={true}
+			/>
+		</WithTheme>
+	))
+	.add('error', () => (
+		<WithTheme>
+			<TrezorEnterPassprase
+				onEnter={action('trezor passprasse enter')}
+				onBack={action('trezor passprasse back')}
+				onPasspraseChange={action('trezor passprasse change')}
+				onRePasspraseChange={action('trezor passprasse repeat change')}
+				onVisibility={action('trezor passprasse visibility change')}
+				error="Super Error"
+			/>
 		</WithTheme>
 	));
 

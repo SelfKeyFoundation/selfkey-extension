@@ -7,7 +7,7 @@ const styles = theme => ({
 	}
 });
 
-const HelpStepsSection = ({ classes }) => {
+export const TrezorHelpStepsSection = withStyles(styles)(({ classes }) => {
 	return (
 		<Grid
 			container
@@ -106,6 +106,6 @@ const HelpStepsSection = ({ classes }) => {
 			</Grid>
 		</Grid>
 	);
-};
+});
 
-export default withStyles(styles)(HelpStepsSection);
+export default TrezorHelpStepsSection;

@@ -7,7 +7,7 @@ const styles = theme => ({
 	}
 });
 
-const HelpStepsErrorSection = ({ classes }) => {
+export const LedgerHelpStepsErrorSection = withStyles(styles)(({ classes }) => {
 	return (
 		<Grid
 			container
@@ -164,6 +164,6 @@ const HelpStepsErrorSection = ({ classes }) => {
 			</Grid>
 		</Grid>
 	);
-};
+});
 
-export default withStyles(styles)(HelpStepsErrorSection);
+export default LedgerHelpStepsErrorSection;

@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { IDIcon, ProfileIcon, LedgerIcon, TrezorIcon } from 'selfkey-ui';
 import { LWSButtonPrimary, LWSButtonTertiary } from './lws-button';
 import { Typography, withStyles } from '@material-ui/core';
+import { LedgerConnect } from './ledger/connect';
 
 export const styles = theme => ({
 	areaTitle: {
@@ -147,35 +148,27 @@ class LWSSelectWalletComponent extends Component {
 		return loginAction(wallet, password);
 	}
 
-	renderHardwareWallet() {
+	renderLedger() {
+		return <LedgerConnect onConnectClick={this.props.onLedgerConnect} />;
+	}
+
+	renderTrezor() {
 		const { classes } = this.props;
 		return (
 			<div>
 				<p className={classes.supportText}>Ledger and Trezor support is coming soon</p>
 			</div>
 		);
-		// return (
-		// 	<div>
-		// 		<p className={classes.supportText}>
-		// 			Make sure your Ledger or Trezor device is plugged in via USB. Press the Connect to hardware
-		// 			wallet button below.
-		// 		</p>
-		// 		<div>
-		// 			<LWSButton className={classes.buttonPrimary} onClick={connectToHardwareWalletAction}>
-		// 				Connect to hardware wallet
-		// 			</LWSButton>
-		// 			<LWSButton className={classes.buttonSecondary}>Retry</LWSButton>
-		// 		</div>
-		// 	</div>
-		// );
 	}
 
 	renderSelection() {
 		const { classes, passwordError, wallets } = this.props;
 		const { wallet, password, view } = this.state;
 		const publicKey = wallet ? wallet.publicKey : '';
-		if (view !== 'eth') {
-			return this.renderHardwareWallet();
+		if (view === 'trezor') {
+			return this.renderTrezor();
+		} else if (view === 'ledger') {
+			return this.renderLedger();
 		} else {
 			return (
 				<div>

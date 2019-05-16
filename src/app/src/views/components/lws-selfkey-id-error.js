@@ -1,6 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core';
-import { LWSButton } from './lws-button';
+import { LWSButtonPrimary } from './lws-button';
 import { ShieldIcon } from 'selfkey-ui';
 import { LWSError } from './lws-error';
 
@@ -38,9 +38,9 @@ export const LWSSelfkeyIdError = withStyles(styles)(({ classes, children, retryA
 		errorName="Create & Unlock Your SelfKey ID"
 		supportText="A SelfKey ID is required to securely authenticate your identity with this website. Please create one in the SelfKey Identity Wallet and keep it open to proceed."
 		actionButton={
-			<LWSButton className={classes.buttonSecondary} onClick={retryAction}>
+			<LWSButtonPrimary className={classes.buttonSecondary} onClick={retryAction}>
 				Retry
-			</LWSButton>
+			</LWSButtonPrimary>
 		}
 	/>
 ));
