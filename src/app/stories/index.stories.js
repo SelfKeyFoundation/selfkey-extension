@@ -29,7 +29,12 @@ import {
 	TrezorBridgeNotFoundError,
 	TrezorConnectionError,
 	TrezorEnterPassprase,
-	TrezorEnterPin
+	TrezorEnterPin,
+	HardwareWalletAuthDeclined,
+	HardwareWalletAuthError,
+	HardwareWalletAuthUnlock,
+	HardwareWalletAuthTimer,
+	HardwareWalletAuthTimeout
 } from '../src/views/components';
 
 const WithTheme = ({ children }) => <SelfkeyDarkTheme>{children}</SelfkeyDarkTheme>;
@@ -262,6 +267,90 @@ storiesOf('Trezor/Enter Password')
 				onRePasspraseChange={action('trezor passprasse repeat change')}
 				onVisibility={action('trezor passprasse visibility change')}
 				error="Super Error"
+			/>
+		</WithTheme>
+	));
+
+storiesOf('HD Auth/Ledger', module)
+	.add('declined ', () => (
+		<WithTheme>
+			<HardwareWalletAuthDeclined
+				walletType="ledger"
+				onOk={action('hd auth ledger declined ok')}
+			/>
+		</WithTheme>
+	))
+	.add('error ', () => (
+		<WithTheme>
+			<HardwareWalletAuthError
+				walletType="ledger"
+				onBack={action('hd auth ledger error back')}
+			/>
+		</WithTheme>
+	))
+	.add('unlock ', () => (
+		<WithTheme>
+			<HardwareWalletAuthUnlock
+				walletType="ledger"
+				onBack={action('hd auth ledger unlock back')}
+			/>
+		</WithTheme>
+	))
+	.add('timer ', () => (
+		<WithTheme>
+			<HardwareWalletAuthTimer
+				walletType="ledger"
+				onBack={action('hd auth ledger timer back')}
+			/>
+		</WithTheme>
+	))
+	.add('timeout ', () => (
+		<WithTheme>
+			<HardwareWalletAuthTimeout
+				walletType="ledger"
+				onBack={action('hd auth ledger timeout back')}
+			/>
+		</WithTheme>
+	));
+
+storiesOf('HD Auth/Trezor', module)
+	.add('declined ', () => (
+		<WithTheme>
+			<HardwareWalletAuthDeclined
+				walletType="trezor"
+				onOk={action('hd auth trezor declined ok')}
+			/>
+		</WithTheme>
+	))
+	.add('error ', () => (
+		<WithTheme>
+			<HardwareWalletAuthError
+				walletType="trezor"
+				onBack={action('hd auth trezor error back')}
+			/>
+		</WithTheme>
+	))
+	.add('unlock ', () => (
+		<WithTheme>
+			<HardwareWalletAuthUnlock
+				walletType="trezor"
+				onBack={action('hd auth trezor unlock back')}
+			/>
+		</WithTheme>
+	))
+	.add('timer ', () => (
+		<WithTheme>
+			<HardwareWalletAuthTimer
+				walletType="trezor"
+				onBack={action('hd auth trezor trezor back')}
+			/>
+		</WithTheme>
+	))
+	.add('timeout ', () => (
+		<WithTheme>
+			<HardwareWalletAuthTimeout
+				walletType="trezor"
+				onBack={action('hd auth trezor timeout back')}
 			/>
 		</WithTheme>
 	));
