@@ -3,7 +3,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 // import { linkTo } from '@storybook/addon-links';
-import { SelfkeyDarkTheme, ShieldIcon, ProfileIcon } from 'selfkey-ui';
+import { ShieldIcon, ProfileIcon } from 'selfkey-ui';
 
 import {
 	LWSAuthError,
@@ -37,11 +37,9 @@ import {
 	HardwareWalletAuthTimeout
 } from '../src/views/components';
 
-const WithTheme = ({ children }) => <SelfkeyDarkTheme>{children}</SelfkeyDarkTheme>;
-
 storiesOf('Common', module)
 	.add('Button', () => (
-		<WithTheme>
+		<div>
 			<br />
 			<br />
 			<LWSButtonPrimary onClick={action('Primary button clicked')}>
@@ -65,10 +63,10 @@ storiesOf('Common', module)
 			<LWSButtonTertiary selected onClick={action('selected tertialy button clicked')}>
 				<ProfileIcon /> <span>Selected Tertiary Button</span>
 			</LWSButtonTertiary>
-		</WithTheme>
+		</div>
 	))
 	.add('Error', () => (
-		<WithTheme>
+		<div>
 			<LWSError
 				actionIcon={<ShieldIcon />}
 				actionName="Generic Error"
@@ -80,22 +78,22 @@ storiesOf('Common', module)
 					</LWSButtonSecondary>
 				}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('Loading', () => (
-		<WithTheme>
+		<div>
 			<LWSLoading />
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('Auth', module)
 	.add('Success', () => (
-		<WithTheme>
+		<div>
 			<LWSSuccess />
-		</WithTheme>
+		</div>
 	))
 	.add('Error', () => (
-		<WithTheme>
+		<div>
 			<LWSAuthError
 				website={{
 					name: 'PaveziCoin',
@@ -105,12 +103,12 @@ storiesOf('Auth', module)
 				}}
 				retryAction={action('retry clicked')}
 			/>
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('Unlock', module)
 	.add('SelectWallet', () => (
-		<WithTheme>
+		<div>
 			<LWSSelectWallet
 				wallets={[
 					{
@@ -128,90 +126,90 @@ storiesOf('Unlock', module)
 				onLedgerConnect={action('ledger connect clicked')}
 				onTrezorConnect={action('trezor connect clicked')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('Id Error', () => (
-		<WithTheme>
+		<div>
 			<LWSSelfkeyIdError />
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('Ledger', module)
 	.add('Help Steps section', () => (
-		<WithTheme>
+		<div>
 			<LedgerHelpStepsSection />
-		</WithTheme>
+		</div>
 	))
 	.add('Help Steps section error', () => (
-		<WithTheme>
+		<div>
 			<LedgerHelpStepsErrorSection />
-		</WithTheme>
+		</div>
 	))
 	.add('Connect', () => (
-		<WithTheme>
+		<div>
 			<LedgerConnect onConnectClick={action('ledger connect click')} />
-		</WithTheme>
+		</div>
 	))
 	.add('Connecting', () => (
-		<WithTheme>
+		<div>
 			<LedgerConnecting handleBack={action('ledger connecting back click')} />
-		</WithTheme>
+		</div>
 	))
 	.add('Connection Error', () => (
-		<WithTheme>
+		<div>
 			<LedgerConnectionError
 				handleRetry={action('ledger connection error retry click')}
 				handleBack={action('ledger connection error back click')}
 			/>
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('Trezor', module)
 	.add('Help Steps section', () => (
-		<WithTheme>
+		<div>
 			<TrezorHelpStepsSection />
-		</WithTheme>
+		</div>
 	))
 	.add('Connect', () => (
-		<WithTheme>
+		<div>
 			<TrezorConnect onConnectClick={action('trezor connect click')} />
-		</WithTheme>
+		</div>
 	))
 	.add('Connection error', () => (
-		<WithTheme>
+		<div>
 			<TrezorConnectionError
 				onRetry={action('trezor connection error retry')}
 				onBack={action('trezor connection error back')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('Connecting', () => (
-		<WithTheme>
+		<div>
 			<TrezorConnecting onBack={action('trezor connecting back')} />
-		</WithTheme>
+		</div>
 	))
 	.add('Bridge not found error', () => (
-		<WithTheme>
+		<div>
 			<TrezorBridgeNotFoundError
 				onRetry={action('trezor bridge retry')}
 				onBack={action('trezor bridge back')}
 			/>
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('Trezor/Enter Pin')
 	.add('default', () => (
-		<WithTheme>
+		<div>
 			<TrezorEnterPin
 				onEnter={action('trezor pin enter')}
 				onBack={action('trezor pin back')}
 				onPinClick={action('trezor pin click')}
 				onClear={action('trezor pin clear')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('value', () => (
-		<WithTheme>
+		<div>
 			<TrezorEnterPin
 				onEnter={action('trezor pin enter')}
 				onBack={action('trezor pin back')}
@@ -219,11 +217,11 @@ storiesOf('Trezor/Enter Pin')
 				onClear={action('trezor pin clear')}
 				pin="12324"
 			/>
-		</WithTheme>
+		</div>
 	))
 
 	.add('error', () => (
-		<WithTheme>
+		<div>
 			<TrezorEnterPin
 				onEnter={action('trezor pin enter')}
 				onBack={action('trezor pin back')}
@@ -231,12 +229,12 @@ storiesOf('Trezor/Enter Pin')
 				onClear={action('trezor pin clear')}
 				error="Super Error"
 			/>
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('Trezor/Enter Password')
 	.add('default', () => (
-		<WithTheme>
+		<div>
 			<TrezorEnterPassprase
 				onEnter={action('trezor passprasse enter')}
 				onBack={action('trezor passprasse back')}
@@ -244,10 +242,10 @@ storiesOf('Trezor/Enter Password')
 				onRePasspraseChange={action('trezor passprasse repeat change')}
 				onVisibility={action('trezor passprasse visibility change')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('visibility', () => (
-		<WithTheme>
+		<div>
 			<TrezorEnterPassprase
 				onEnter={action('trezor passprasse enter')}
 				onBack={action('trezor passprasse back')}
@@ -256,10 +254,10 @@ storiesOf('Trezor/Enter Password')
 				onVisibility={action('trezor passprasse visibility change')}
 				visibility={true}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('error', () => (
-		<WithTheme>
+		<div>
 			<TrezorEnterPassprase
 				onEnter={action('trezor passprasse enter')}
 				onBack={action('trezor passprasse back')}
@@ -268,95 +266,95 @@ storiesOf('Trezor/Enter Password')
 				onVisibility={action('trezor passprasse visibility change')}
 				error="Super Error"
 			/>
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('HD Auth/Ledger', module)
 	.add('declined ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthDeclined
 				walletType="ledger"
 				onOk={action('hd auth ledger declined ok')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('error ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthError
 				walletType="ledger"
 				onBack={action('hd auth ledger error back')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('unlock ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthUnlock
 				walletType="ledger"
 				onBack={action('hd auth ledger unlock back')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('timer ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthTimer
 				walletType="ledger"
 				onBack={action('hd auth ledger timer back')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('timeout ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthTimeout
 				walletType="ledger"
 				onBack={action('hd auth ledger timeout back')}
 			/>
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('HD Auth/Trezor', module)
 	.add('declined ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthDeclined
 				walletType="trezor"
 				onOk={action('hd auth trezor declined ok')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('error ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthError
 				walletType="trezor"
 				onBack={action('hd auth trezor error back')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('unlock ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthUnlock
 				walletType="trezor"
 				onBack={action('hd auth trezor unlock back')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('timer ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthTimer
 				walletType="trezor"
 				onBack={action('hd auth trezor trezor back')}
 			/>
-		</WithTheme>
+		</div>
 	))
 	.add('timeout ', () => (
-		<WithTheme>
+		<div>
 			<HardwareWalletAuthTimeout
 				walletType="trezor"
 				onBack={action('hd auth trezor timeout back')}
 			/>
-		</WithTheme>
+		</div>
 	));
 
 storiesOf('Attributes', module).add('Checklist', () => (
-	<WithTheme>
+	<div>
 		<LWSRequiredInfo
 			requested={[
 				{
@@ -433,14 +431,14 @@ storiesOf('Attributes', module).add('Checklist', () => (
 				policyUrl: 'http://www.pavezicoin.org/privacy'
 			}}
 		/>
-	</WithTheme>
+	</div>
 ));
 
 storiesOf('Wallet connection').add('Connection Error', () => (
-	<WithTheme>
+	<div>
 		<LWSWalletConnectionError
 			downloadWalletAction={action('download wallet')}
 			retryAction={action('retry connecting')}
 		/>
-	</WithTheme>
+	</div>
 ));
