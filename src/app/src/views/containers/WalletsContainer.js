@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { walletsOperations, walletsSelectors } from '../../state/wallets';
-import { LWSSelectWallet, LWSLoading } from 'selfkey-ui';
+import { LWSSelectWallet, LWSLoading } from '../components';
 
 class WalletsContainer extends Component {
 	componentDidMount() {
@@ -13,6 +13,9 @@ class WalletsContainer extends Component {
 	handleLogin = (wallet, password) => {
 		this.props.dispatch(walletsOperations.unlockWallet(wallet.publicKey, password));
 	};
+	handleLedgerConnect = () => {
+		console.log('XXX ledger connect');
+	};
 	render() {
 		const { wallets, error } = this.props;
 		if (!wallets || !wallets.length) {
@@ -22,6 +25,7 @@ class WalletsContainer extends Component {
 			<LWSSelectWallet
 				wallets={wallets}
 				loginAction={this.handleLogin}
+				onLedgerConnect={this.handleLedgerConnect}
 				passwordError={!!error}
 			/>
 		);

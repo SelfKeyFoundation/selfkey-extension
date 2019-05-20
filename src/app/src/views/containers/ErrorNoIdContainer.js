@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { LWSSelfkeyIdError } from 'selfkey-ui';
+import { LWSSelfkeyIdError } from '../components';
 class ErrorNoIdContainer extends Component {
 	retryAction = evt => {
 		evt.preventDefault();

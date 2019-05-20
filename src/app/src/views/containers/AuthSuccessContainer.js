@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { LWSSuccess } from 'selfkey-ui';
+import { LWSSuccess } from '../components';
 
 class AuthSuccessContainer extends Component {
 	render() {

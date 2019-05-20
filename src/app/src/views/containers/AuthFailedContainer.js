@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { LWSAuthError } from 'selfkey-ui';
+import { LWSAuthError } from '../components';
 import { appSelectors } from '../../state/app';
 import { push } from 'react-router-redux';
 
