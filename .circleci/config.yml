@@ -87,10 +87,16 @@ workflows:
   version: 2
   main:
     jobs:
-      - 'unit-test'
+      - 'unit-test':
+          filters:
+            tags:
+              only: /.*/
       - 'build':
           requires:
             - unit-test
+          filters:
+            tags:
+              only: /.*/
       - 'publish':
           requires:
             - build
