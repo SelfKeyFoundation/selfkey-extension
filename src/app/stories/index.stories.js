@@ -114,6 +114,7 @@ storiesOf('Unlock', module)
 					{
 						publicKey: '0x4184288c556524df9cb9e58b73265ee66dca4efe',
 						unlocked: true,
+						name: 'test1',
 						profile: 'local'
 					},
 					{
@@ -356,28 +357,15 @@ storiesOf('HD Auth/Trezor', module)
 storiesOf('Attributes', module).add('Checklist', () => (
 	<div>
 		<LWSRequiredInfo
-			requested={[
-				{
-					label: 'Name',
-					key: 'first_name',
-					attribute: 'http://platform.selfkey.org/schema/attribute/first-name.json'
-				},
-				{ label: 'Country', key: 'country' },
-				{
-					key: 'last_name',
-					attribute: 'http://platform.selfkey.org/schema/attribute/last-name.json'
-				},
-				{
-					label: 'Birth Day',
-					key: 'birthdate',
-					attribute: 'http://platform.selfkey.org/schema/attribute/birth-date.json'
-				}
-			]}
 			attributes={[
 				{
-					url: 'http://platform.selfkey.org/schema/attribute/first-name.json',
-					value: 'Test1',
-					name: 'first_name',
+					uiId: '1',
+					schemaId: 'http://platform.selfkey.org/schema/attribute/first-name.json',
+					options: [
+						{ id: 1, value: 'Test1', name: 'First Name 1' },
+						{ id: 4, value: 'Test12', name: 'First Name 2' }
+					],
+					title: 'Name',
 					schema: {
 						$id: 'http://platform.selfkey.org/schema/attribute/first-name.json',
 						$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
@@ -387,12 +375,17 @@ storiesOf('Attributes', module).add('Checklist', () => (
 						description: "An individual's first (given) name.",
 						type: 'string'
 					},
-					id: 1
+					id: 'first_name'
 				},
 				{
-					url: 'http://platform.selfkey.org/schema/attribute/last-name.json',
-					value: 'Test2',
-					name: 'last_name',
+					uiId: '2',
+					schemaId: 'http://platform.selfkey.org/schema/attribute/last-name.json',
+					options: [
+						{ id: 2, value: 'Test2', name: 'Last namee 1' },
+						{ id: 5, value: 'Test22', name: 'Last namee 2' }
+					],
+					selected: 1,
+					title: 'Last Name',
 					schema: {
 						$id: 'http://platform.selfkey.org/schema/attribute/last-name.json',
 						$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
@@ -402,14 +395,17 @@ storiesOf('Attributes', module).add('Checklist', () => (
 						description: "An individual's last (family) name.",
 						type: 'string'
 					},
-					id: 2
+					id: 'last_name'
 				},
 				{
-					url: 'http://platform.selfkey.org/schema/attribute/birth-date.json',
-					value: { day: 1, month: 2, year: 1991 },
-					name: 'birthdate1',
+					uiId: '3',
+					schemaId: 'http://platform.selfkey.org/schema/attribute/birth-date.json',
+					options: [
+						{ id: 3, value: { day: 1, month: 2, year: 1991 }, name: 'Birth Date' }
+					],
+					title: 'Birth Day',
 					schema: {
-						$id: 'http://platform.selfkey.org/schema/attribute/last-name.json',
+						$id: 'http://platform.selfkey.org/schema/attribute/la˝st-name.json',
 						$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
 						identityAttribute: true,
 						identityAttributeRepository: 'http://platform.selfkey.org/repository.json',
@@ -417,13 +413,14 @@ storiesOf('Attributes', module).add('Checklist', () => (
 						description: "An individual's last (family) name.",
 						type: 'string'
 					},
-					id: 2
+					id: 'birthdate'
 				}
 			]}
 			notAllowedAttributes={['http://platform.selfkey.org/schema/attribute/birth-date.json']}
 			disallowAttributeAction={(attribute, disallow) => {
 				alert(attribute.key + ' ' + disallow);
 			}}
+			onOptionSelected={action('attribute option selected')}
 			website={{
 				name: 'PaveziCoin',
 				url: 'http://www.pavezicoin.org',

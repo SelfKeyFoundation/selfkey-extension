@@ -1,6 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
-import { withStyles } from '@material-ui/core';
+import { withStyles, RadioGroup, Radio, FormControlLabel } from '@material-ui/core';
 import { CheckIcon, CheckEmptyIcon, EditTransparentIcon, AttributeAlertIcon } from 'selfkey-ui';
 import { LWSButtonPrimary, LWSButtonSecondary } from './lws-button';
 
@@ -88,41 +87,42 @@ const styles = theme => ({
 
 	edit: {
 		cursor: 'pointer'
+	},
+	radioGroup: {
+		backgroundColor: 'transparent',
+		marginBottom: 0,
+		paddingTop: '10px'
+	},
+	formControlLabel: {
+		'& span': {
+			fontSize: '14px',
+			lineHeight: '17px'
+		}
 	}
 });
 
-const getAttributeValue = attribute => {
-	if (!attribute.value) return null;
-	if (typeof attribute.value !== 'object') return attribute.value;
-	return attribute.name || attribute.schema.title || attribute.url;
+const getAttributeValue = ({ value, name }) => {
+	if (!value) return null;
+	if (typeof value !== 'object') return value;
+	return name;
 };
 
 const renderAttributes = (
-	requested,
 	attributes,
 	notAllowedAttributes,
 	classes,
 	disallowAttributeAction,
-	editAction
+	editAction,
+	onOptionSelected
 ) => {
-	let attrs = requested.map(attr => {
-		if (typeof attr !== 'object') {
-			attr = { attribute: attr };
-		}
-		let found = _.find(attributes, { url: attr.id || attr.attribute }) || {};
-		let merged = { ...attr, ...found };
-		if (!merged.label && merged.schema && merged.schema.title) {
-			merged.label = merged.schema.title;
-		}
-		return merged;
-	});
-	return attrs.map((attribute, index) => {
-		const attributeValue = getAttributeValue(attribute);
-		const notAllowed = notAllowedAttributes.includes(attribute.url);
+	return attributes.map(attribute => {
+		let { title, uiId, options, selected = 0 } = attribute;
+		options = options || [];
+		const notAllowed = notAllowedAttributes.includes(uiId);
 
-		if (attributeValue) {
+		if (options.length === 1) {
 			return (
-				<div key={index}>
+				<div key={uiId}>
 					<div className={classes.attribute}>
 						<span
 							className={classes.clickable}
@@ -131,19 +131,52 @@ const renderAttributes = (
 							{notAllowed ? <CheckEmptyIcon /> : <CheckIcon />}
 						</span>
 						<dl>
-							<dt>{attribute.label || attribute.schema.title}</dt>
-							<dd>{attributeValue}</dd>
+							<dt>{title}</dt>
+							<dd>{getAttributeValue(options[0])}</dd>
+						</dl>
+					</div>
+				</div>
+			);
+		} else if (options.length > 1) {
+			return (
+				<div key={uiId}>
+					<div className={classes.attribute}>
+						<span
+							className={classes.clickable}
+							onClick={() => disallowAttributeAction(attribute, !notAllowed)}
+						>
+							{notAllowed ? <CheckEmptyIcon /> : <CheckIcon />}
+						</span>
+						<dl>
+							<dt>{title}</dt>
+							<dd>
+								<RadioGroup
+									className={classes.radioGroup}
+									value={selected}
+									onChange={evt => onOptionSelected(uiId, +evt.target.value)}
+								>
+									{options.map((opt, indx) => (
+										<FormControlLabel
+											key={indx}
+											value={indx}
+											control={<Radio />}
+											label={opt.name}
+											className={classes.formControlLabel}
+										/>
+									))}
+								</RadioGroup>
+							</dd>
 						</dl>
 					</div>
 				</div>
 			);
 		} else {
 			return (
-				<div key={index}>
+				<div key={uiId}>
 					<div className={classes.attribute}>
 						<AttributeAlertIcon />
 						<dl>
-							<dt>{attribute.label}</dt>
+							<dt>{title}</dt>
 							{editAction ? (
 								<dd>
 									<a onClick={editAction} className={classes.edit}>
@@ -164,12 +197,12 @@ export const LWSRequiredInfo = withStyles(styles)(
 	({
 		classes,
 		allowAction,
-		requested,
 		cancelAction,
 		editAction,
 		attributes,
 		notAllowedAttributes = [],
 		website,
+		onOptionSelected = () => {},
 		disallowAttributeAction = () => {}
 	}) => (
 		<div className={classes.requiredInfo}>
@@ -183,12 +216,12 @@ export const LWSRequiredInfo = withStyles(styles)(
 			</div>
 			<div className={classes.form}>
 				{renderAttributes(
-					requested,
 					attributes,
 					notAllowedAttributes,
 					classes,
 					disallowAttributeAction,
-					editAction
+					editAction,
+					onOptionSelected
 				)}
 
 				<div className={classes.tocMessage}>
