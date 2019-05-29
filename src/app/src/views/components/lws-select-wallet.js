@@ -157,14 +157,24 @@ class LWSSelectWalletComponent extends Component {
 		return <TrezorConnect onConnectClick={this.props.onTrezorConnect} />;
 	}
 
+	renderComingSoon() {
+		return (
+			<Typography variant="body1" className={this.props.classes.supportText}>
+				Coming Soon...
+			</Typography>
+		);
+	}
+
 	renderSelection() {
 		const { classes, passwordError, wallets } = this.props;
 		const { wallet, password, view } = this.state;
 		const publicKey = wallet ? wallet.publicKey : '';
 		if (view === 'trezor') {
-			return this.renderTrezor();
+			// return this.renderTrezor();
+			return this.renderComingSoon();
 		} else if (view === 'ledger') {
-			return this.renderLedger();
+			// return this.renderLedger();
+			return this.renderComingSoon();
 		} else {
 			return (
 				<div>
@@ -179,6 +189,7 @@ class LWSSelectWalletComponent extends Component {
 							{wallets.filter(w => w.profile === 'local').map((wallet, index) => {
 								return (
 									<option key={index} value={wallet.publicKey}>
+										{wallet.name ? `${wallet.name} - ` : null}
 										0x
 										{wallet.publicKey.replace('0x', '')}
 									</option>

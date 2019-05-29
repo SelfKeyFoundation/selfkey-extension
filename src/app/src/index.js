@@ -17,6 +17,10 @@ import { setGlobalContext, configureContext } from './context';
 const ctx = configureContext(window.REDUX_INITIAL_DATA).cradle;
 setGlobalContext(ctx);
 
+// ctx.store.subscribe(() => {
+// 	console.log('XXX', ctx.store.getState());
+// });
+
 const RootHtml = () => (
 	<SelfkeyDarkTheme>
 		<ReduxProvider store={ctx.store}>

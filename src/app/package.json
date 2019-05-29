@@ -14,7 +14,8 @@
         "react-scripts": "1.1.4",
         "redux": "^4.0.0",
         "redux-logger": "^3.0.6",
-        "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#6e1598f7396498f04a44557e14836c72e40eed7e"
+        "selfkey-ui": "https://github.com/SelfKeyFoundation/selfkey-ui.git#6e1598f7396498f04a44557e14836c72e40eed7e",
+        "uuid": "^3.3.2"
     },
     "devDependencies": {
         "@babel/core": "^7.4.4",

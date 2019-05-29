@@ -11,9 +11,14 @@ const setAttributesLoading = loading => ({
 	payload: loading
 });
 
-const disallowAttributes = (url, disallow) => ({
+const disallowAttributes = (uiId, disallow) => ({
 	type: types.ATTRIBUTES_DISALLOW,
-	payload: { url, disallow }
+	payload: { uiId, disallow }
 });
 
-export { updateAttributes, setAttributesLoading, disallowAttributes };
+const selectAttributeOption = (uiId, option) => ({
+	type: types.ATTRIBUTES_OPTION_SELECT,
+	payload: { uiId, option }
+});
+
+export { updateAttributes, setAttributesLoading, disallowAttributes, selectAttributeOption };

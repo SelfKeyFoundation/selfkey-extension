@@ -15,10 +15,13 @@ class AttributesContainer extends Component {
 	};
 	handleDisallow = (attribute, disallow) => {
 		console.log('handleDisallow', attribute, disallow);
-		this.props.dispatch(attributesOperations.disallowAttributes(attribute.url, disallow));
+		this.props.dispatch(attributesOperations.disallowAttributes(attribute.uiId, disallow));
 	};
 	handleCancel = evt => {
 		this.props.dispatch(attributesOperations.clearAttributes());
+	};
+	handleAttributeOptionSelected = (uiId, option) => {
+		this.props.dispatch(attributesOperations.selectAttributeOption(uiId, option));
 	};
 	render() {
 		const { attributes, config, loading, disallowed } = this.props;
@@ -28,9 +31,9 @@ class AttributesContainer extends Component {
 				attributes={attributes}
 				notAllowedAttributes={disallowed}
 				website={config.website}
-				requested={config.attributes}
 				allowAction={this.handleAuth}
 				cancelAction={this.handleCancel}
+				onOptionSelected={this.handleAttributeOptionSelected}
 				disallowAttributeAction={this.handleDisallow}
 			/>
 		);
