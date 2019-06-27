@@ -1,7 +1,7 @@
 /* global chrome */
 const MSG_SRC = 'popup';
 const PORT_NAME = 'LWS_APP';
-const BG_REQ_TIMEOUT = 5000;
+const BG_REQ_TIMEOUT = 15000;
 export class LWSService {
 	constructor({ store }) {
 		this.port = null;

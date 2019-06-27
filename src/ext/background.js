@@ -14,7 +14,7 @@ const ALLOWED_REQUESTS = [
 	'signup'
 ];
 const MSG_SRC = 'bg';
-const WS_REQ_TIMEOUT = 5000;
+const WS_REQ_TIMEOUT = 15000;
 const WS_RECONNECT_INTERVAL = 5000;
 
 const bg = {
