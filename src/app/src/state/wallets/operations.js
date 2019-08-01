@@ -20,9 +20,6 @@ const loadWallets = () => async (dispatch, getState) => {
 			console.error('unknown error', error);
 			return;
 		}
-		if (error.payload.code === 'no_id') {
-			return dispatch(push(`${config.hash}/error/no-id`));
-		}
 		if (error.payload.code === 'idw_no_conn') {
 			return dispatch(push(`${config.hash}/error/no-idw`));
 		}
@@ -38,7 +35,6 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 		let wallet = getOneWallet(getState(), publicKey);
 		if (wallet && wallet.unlocked) {
 			await dispatch(actions.selectWallet(publicKey));
-
 			if (!wallet.signedUp || !(await dispatch(loginWithWallet(wallet.publicKey)))) {
 				await dispatch(push(`${config.hash}/auth/attributes`));
 			}
@@ -49,6 +45,12 @@ const unlockWallet = (publicKey, password) => async (dispatch, getState) => {
 			return dispatch(
 				actions.updateWallets({ code: 'unlock_failed', message: 'Failed to unlock' }, true)
 			);
+		}
+		if (!unlocked.payload.hasSelfkeyId) {
+			return dispatch(push(`${config.hash}/error/no-id`));
+		}
+		if (config.did && !unlocked.payload.did) {
+			return dispatch(push(`${config.hash}/error/no-did`));
 		}
 		await dispatch(actions.updateWallets(null, true));
 		await dispatch(actions.updateOneWallet(unlocked.payload));

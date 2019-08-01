@@ -1,6 +1,12 @@
 import React from 'react';
 import { withStyles, RadioGroup, Radio, FormControlLabel } from '@material-ui/core';
-import { CheckIcon, CheckEmptyIcon, EditTransparentIcon, AttributeAlertIcon } from 'selfkey-ui';
+import {
+	CheckIcon,
+	CheckEmptyIcon,
+	EditTransparentIcon,
+	AttributeAlertIcon,
+	error
+} from 'selfkey-ui';
 import { LWSButtonPrimary, LWSButtonSecondary } from './lws-button';
 
 const styles = theme => ({
@@ -34,7 +40,7 @@ const styles = theme => ({
 	attribute: {
 		display: 'flex',
 		flexDirection: 'row',
-		padding: '0 0 30px',
+		padding: '0 0 30px 0',
 		color: '#FFF',
 		'& svg': {
 			flex: '20px'
@@ -53,25 +59,23 @@ const styles = theme => ({
 	},
 
 	did: {
-		display: 'flex',
-		justifyContent: 'space-between',
 		width: '100%',
-		flexDirection: 'row',
-		padding: '0 18px 30px 33px',
+		padding: '0 0 30px 0',
 		boxSizing: 'border-box',
 		color: '#FFF',
 		'& dd': {
 			color: '#93B0C1',
 			wordBreak: 'break-word',
-			textAlign: 'right'
+			marginTop: '10px',
+			fontSize: '11px'
 		}
 	},
 
 	didRequired: {
 		textAlign: 'center',
-		color: '#FE4B61',
+		color: error,
 		fontWeight: 700,
-		padding: '0px 33px 30px'
+		padding: '0px 33px 0'
 	},
 
 	clickable: {
@@ -113,13 +117,19 @@ const styles = theme => ({
 	radioGroup: {
 		backgroundColor: 'transparent',
 		marginBottom: 0,
-		paddingTop: '10px'
+		paddingTop: '10px',
+		'& > label': {
+			marginRight: '0px !important'
+		}
 	},
 	formControlLabel: {
 		'& span': {
 			fontSize: '14px',
 			lineHeight: '17px'
 		}
+	},
+	required: {
+		color: error
 	}
 });
 
@@ -127,6 +137,18 @@ const getAttributeValue = ({ value, name }) => {
 	if (!value) return null;
 	if (typeof value !== 'object') return value;
 	return name;
+};
+
+const canSubmit = ({ did, didRequired, attributes = [], notAllowedAttributes = [] }) => {
+	if (didRequired && !did) {
+		return false;
+	}
+
+	return attributes.reduce((allowed, curr) => {
+		if (!allowed || !curr.required) return allowed;
+		if (!curr.options || !curr.options.length) return false;
+		return !notAllowedAttributes.includes(curr.uiId);
+	}, true);
 };
 
 const renderAttributes = (
@@ -138,7 +160,7 @@ const renderAttributes = (
 	onOptionSelected
 ) => {
 	return attributes.map(attribute => {
-		let { title, uiId, options, selected = 0 } = attribute;
+		let { title, uiId, options, selected = 0, required } = attribute;
 		options = options || [];
 		const notAllowed = notAllowedAttributes.includes(uiId);
 
@@ -153,7 +175,17 @@ const renderAttributes = (
 							{notAllowed ? <CheckEmptyIcon /> : <CheckIcon />}
 						</span>
 						<dl>
-							<dt>{title}</dt>
+							<dt>
+								{title}
+								{required ? (
+									<span className={notAllowed ? classes.required : null}>
+										{' '}
+										(required)
+									</span>
+								) : (
+									''
+								)}
+							</dt>
 							<dd>{getAttributeValue(options[0])}</dd>
 						</dl>
 					</div>
@@ -170,7 +202,17 @@ const renderAttributes = (
 							{notAllowed ? <CheckEmptyIcon /> : <CheckIcon />}
 						</span>
 						<dl>
-							<dt>{title}</dt>
+							<dt>
+								{title}
+								{required ? (
+									<span className={notAllowed ? classes.required : null}>
+										{' '}
+										(required)
+									</span>
+								) : (
+									''
+								)}
+							</dt>
 							<dd>
 								<RadioGroup
 									className={classes.radioGroup}
@@ -198,7 +240,14 @@ const renderAttributes = (
 					<div className={classes.attribute}>
 						<AttributeAlertIcon />
 						<dl>
-							<dt>{title}</dt>
+							<dt>
+								{title}
+								{required ? (
+									<span className={classes.required}> (required)</span>
+								) : (
+									''
+								)}
+							</dt>
 							{editAction ? (
 								<dd>
 									<a onClick={editAction} className={classes.edit}>
@@ -281,7 +330,12 @@ export const LWSRequiredInfo = withStyles(styles)(
 				</div>
 				<div className={classes.formSubmitColumn}>
 					<LWSButtonSecondary onClick={cancelAction}>Cancel</LWSButtonSecondary>
-					<LWSButtonPrimary onClick={allowAction} disabled={didRequired && !did}>
+					<LWSButtonPrimary
+						onClick={allowAction}
+						disabled={
+							!canSubmit({ did, didRequired, attributes, notAllowedAttributes })
+						}
+					>
 						Allow
 					</LWSButtonPrimary>
 				</div>

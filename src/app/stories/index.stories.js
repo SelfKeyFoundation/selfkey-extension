@@ -426,11 +426,168 @@ storiesOf('Attributes', module)
 						id: 'birthdate'
 					}
 				]}
-				notAllowedAttributes={[
-					'http://platform.selfkey.org/schema/attribute/birth-date.json'
-				]}
+				notAllowedAttributes={['3']}
 				disallowAttributeAction={(attribute, disallow) => {
-					alert(attribute.key + ' ' + disallow);
+					alert(attribute.uiId + ' ' + disallow);
+				}}
+				onOptionSelected={action('attribute option selected')}
+				website={{
+					name: 'PaveziCoin',
+					url: 'http://www.pavezicoin.org',
+					termsUrl: 'http://www.pavezicoin.org/terms',
+					policyUrl: 'http://www.pavezicoin.org/privacy'
+				}}
+			/>
+		</div>
+	))
+	.add('Checklist', () => (
+		<div>
+			<LWSRequiredInfo
+				attributes={[
+					{
+						uiId: '1',
+						schemaId: 'http://platform.selfkey.org/schema/attribute/first-name.json',
+						options: [
+							{ id: 1, value: 'Test1', name: 'First Name 1' },
+							{ id: 4, value: 'Test12', name: 'First Name 2' }
+						],
+						title: 'Name',
+						schema: {
+							$id: 'http://platform.selfkey.org/schema/attribute/first-name.json',
+							$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
+							identityAttribute: true,
+							identityAttributeRepository:
+								'http://platform.selfkey.org/repository.json',
+							title: 'First Name',
+							description: "An individual's first (given) name.",
+							type: 'string'
+						},
+						id: 'first_name'
+					},
+					{
+						uiId: '2',
+						schemaId: 'http://platform.selfkey.org/schema/attribute/last-name.json',
+						options: [
+							{ id: 2, value: 'Test2', name: 'Last namee 1' },
+							{ id: 5, value: 'Test22', name: 'Last namee 2' }
+						],
+						selected: 1,
+						title: 'Last Name',
+						schema: {
+							$id: 'http://platform.selfkey.org/schema/attribute/last-name.json',
+							$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
+							identityAttribute: true,
+							identityAttributeRepository:
+								'http://platform.selfkey.org/repository.json',
+							title: 'Last Name',
+							description: "An individual's last (family) name.",
+							type: 'string'
+						},
+						id: 'last_name'
+					},
+					{
+						uiId: '3',
+						schemaId: 'http://platform.selfkey.org/schema/attribute/birth-date.json',
+						options: [
+							{ id: 3, value: { day: 1, month: 2, year: 1991 }, name: 'Birth Date' }
+						],
+						title: 'Birth Day',
+						schema: {
+							$id: 'http://platform.selfkey.org/schema/attribute/la˝st-name.json',
+							$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
+							identityAttribute: true,
+							identityAttributeRepository:
+								'http://platform.selfkey.org/repository.json',
+							title: 'Birtdate',
+							description: "An individual's last (family) name.",
+							type: 'string'
+						},
+						id: 'birthdate'
+					}
+				]}
+				notAllowedAttributes={['3']}
+				disallowAttributeAction={(attribute, disallow) => {
+					alert(attribute.uiId + ' ' + disallow);
+				}}
+				onOptionSelected={action('attribute option selected')}
+				website={{
+					name: 'PaveziCoin',
+					url: 'http://www.pavezicoin.org',
+					termsUrl: 'http://www.pavezicoin.org/terms',
+					policyUrl: 'http://www.pavezicoin.org/privacy'
+				}}
+			/>
+		</div>
+	))
+	.add('Checklist attr required', () => (
+		<div>
+			<LWSRequiredInfo
+				attributes={[
+					{
+						uiId: '1',
+						schemaId: 'http://platform.selfkey.org/schema/attribute/first-name.json',
+						options: [
+							{ id: 1, value: 'Test1', name: 'First Name 1' },
+							{ id: 4, value: 'Test12', name: 'First Name 2' }
+						],
+						title: 'Name',
+						schema: {
+							$id: 'http://platform.selfkey.org/schema/attribute/first-name.json',
+							$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
+							identityAttribute: true,
+							identityAttributeRepository:
+								'http://platform.selfkey.org/repository.json',
+							title: 'First Name',
+							description: "An individual's first (given) name.",
+							type: 'string'
+						},
+						id: 'first_name'
+					},
+					{
+						uiId: '2',
+						schemaId: 'http://platform.selfkey.org/schema/attribute/last-name.json',
+						options: [
+							{ id: 2, value: 'Test2', name: 'Last namee 1' },
+							{ id: 5, value: 'Test22', name: 'Last namee 2' }
+						],
+						selected: 1,
+						title: 'Last Name',
+						schema: {
+							$id: 'http://platform.selfkey.org/schema/attribute/last-name.json',
+							$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
+							identityAttribute: true,
+							identityAttributeRepository:
+								'http://platform.selfkey.org/repository.json',
+							title: 'Last Name',
+							description: "An individual's last (family) name.",
+							type: 'string'
+						},
+						id: 'last_name'
+					},
+					{
+						uiId: '3',
+						schemaId: 'http://platform.selfkey.org/schema/attribute/birth-date.json',
+						options: [
+							{ id: 3, value: { day: 1, month: 2, year: 1991 }, name: 'Birth Date' }
+						],
+						title: 'Birth Day',
+						schema: {
+							$id: 'http://platform.selfkey.org/schema/attribute/la˝st-name.json',
+							$schema: 'http://platform.selfkey.org/schema/identity-attribute.json',
+							identityAttribute: true,
+							identityAttributeRepository:
+								'http://platform.selfkey.org/repository.json',
+							title: 'Birtdate',
+							description: "An individual's last (family) name.",
+							type: 'string'
+						},
+						id: 'birthdate',
+						required: true
+					}
+				]}
+				notAllowedAttributes={['3']}
+				disallowAttributeAction={(attribute, disallow) => {
+					alert(attribute.uiId + ' ' + disallow);
 				}}
 				onOptionSelected={action('attribute option selected')}
 				website={{
@@ -509,11 +666,9 @@ storiesOf('Attributes', module)
 						id: 'birthdate'
 					}
 				]}
-				notAllowedAttributes={[
-					'http://platform.selfkey.org/schema/attribute/birth-date.json'
-				]}
+				notAllowedAttributes={['3']}
 				disallowAttributeAction={(attribute, disallow) => {
-					alert(attribute.key + ' ' + disallow);
+					alert(attribute.uiId + ' ' + disallow);
 				}}
 				onOptionSelected={action('attribute option selected')}
 				website={{
@@ -591,11 +746,9 @@ storiesOf('Attributes', module)
 						id: 'birthdate'
 					}
 				]}
-				notAllowedAttributes={[
-					'http://platform.selfkey.org/schema/attribute/birth-date.json'
-				]}
+				notAllowedAttributes={['3']}
 				disallowAttributeAction={(attribute, disallow) => {
-					alert(attribute.key + ' ' + disallow);
+					alert(attribute.uiId + ' ' + disallow);
 				}}
 				onOptionSelected={action('attribute option selected')}
 				website={{
