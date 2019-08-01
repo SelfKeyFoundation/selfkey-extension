@@ -52,6 +52,28 @@ const styles = theme => ({
 		}
 	},
 
+	did: {
+		display: 'flex',
+		justifyContent: 'space-between',
+		width: '100%',
+		flexDirection: 'row',
+		padding: '0 18px 30px 33px',
+		boxSizing: 'border-box',
+		color: '#FFF',
+		'& dd': {
+			color: '#93B0C1',
+			wordBreak: 'break-word',
+			textAlign: 'right'
+		}
+	},
+
+	didRequired: {
+		textAlign: 'center',
+		color: '#FE4B61',
+		fontWeight: 700,
+		padding: '0px 33px 30px'
+	},
+
 	clickable: {
 		cursor: 'pointer'
 	},
@@ -197,6 +219,8 @@ export const LWSRequiredInfo = withStyles(styles)(
 	({
 		classes,
 		allowAction,
+		didRequired,
+		did,
 		cancelAction,
 		editAction,
 		attributes,
@@ -214,6 +238,22 @@ export const LWSRequiredInfo = withStyles(styles)(
 					would like to access this information:
 				</h4>
 			</div>
+			{didRequired && !did ? (
+				<div className={classes.didRequired}>
+					Selfkey DID required for this website. Please create it in Selfkey Identity
+					Wallet.
+				</div>
+			) : (
+				''
+			)}
+			{didRequired && did ? (
+				<dl className={classes.did}>
+					<dt>DID</dt>
+					<dd>{did}</dd>
+				</dl>
+			) : (
+				''
+			)}
 			<div className={classes.form}>
 				{renderAttributes(
 					attributes,
@@ -241,7 +281,9 @@ export const LWSRequiredInfo = withStyles(styles)(
 				</div>
 				<div className={classes.formSubmitColumn}>
 					<LWSButtonSecondary onClick={cancelAction}>Cancel</LWSButtonSecondary>
-					<LWSButtonPrimary onClick={allowAction}>Allow</LWSButtonPrimary>
+					<LWSButtonPrimary onClick={allowAction} disabled={didRequired && !did}>
+						Allow
+					</LWSButtonPrimary>
 				</div>
 			</div>
 		</div>

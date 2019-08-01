@@ -26,6 +26,9 @@ const styles = theme => ({
 		width: '100%',
 		'&:hover': {
 			background: 'linear-gradient(45deg, #09A8BA 0%, #0ABBD0 100%)'
+		},
+		'&:disabled': {
+			opacity: 0.5
 		}
 	},
 
@@ -69,11 +72,13 @@ const styles = theme => ({
 	}
 });
 
-export const LWSButton = withStyles(styles)(({ classes, children, className, onClick }) => (
-	<button className={`${classes.root} ${className}`} onClick={onClick}>
-		{children}
-	</button>
-));
+export const LWSButton = withStyles(styles)(
+	({ classes, children, className, onClick, disabled }) => (
+		<button className={`${classes.root} ${className}`} onClick={onClick} disabled={disabled}>
+			{children}
+		</button>
+	)
+);
 
 export const LWSButtonTertiary = withStyles(styles)(
 	({ classes, children, className, onClick, selected = false }) => (
@@ -90,11 +95,17 @@ export const LWSButtonTertiary = withStyles(styles)(
 	)
 );
 
-export const LWSButtonPrimary = withStyles(styles)(({ classes, children, className, onClick }) => (
-	<LWSButton className={`${classes.buttonPrimary} ${className}`} onClick={onClick}>
-		{children}
-	</LWSButton>
-));
+export const LWSButtonPrimary = withStyles(styles)(
+	({ classes, children, className, disabled, onClick }) => (
+		<LWSButton
+			className={`${classes.buttonPrimary} ${className}`}
+			onClick={onClick}
+			disabled={disabled}
+		>
+			{children}
+		</LWSButton>
+	)
+);
 
 export const LWSButtonSecondary = withStyles(styles)(
 	({ classes, children, className, onClick }) => (
