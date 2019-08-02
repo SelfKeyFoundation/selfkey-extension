@@ -36,7 +36,7 @@ export const LWSSelfkeyDIDError = withStyles(styles)(({ classes, children, retry
 		actionIcon={<ShieldIcon />}
 		actionName="Action Required"
 		errorName="Create & Unlock Your SelfKey DID"
-		supportText="A SelfKey DID is required to securely authenticate your identity with this website. Please create one in the SelfKey Identity Wallet and keep it open to proceed."
+		supportText="A SelfKey DID is required to securely authenticate your identity with this website. Please create one in the SelfKey Identity Wallet, under SelfKey ID, and keep it open to proceed."
 		actionButton={
 			<LWSButtonPrimary className={classes.buttonSecondary} onClick={retryAction}>
 				Retry
