@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { LWSRequiredInfo, LWSLoading } from '../components';
 import { attributesSelectors, attributesOperations } from '../../state/attributes';
+import { walletsSelectors } from '../../state/wallets';
 import { appSelectors } from '../../state/app';
 class AttributesContainer extends Component {
 	componentDidMount() {
@@ -24,11 +25,13 @@ class AttributesContainer extends Component {
 		this.props.dispatch(attributesOperations.selectAttributeOption(uiId, option));
 	};
 	render() {
-		const { attributes, config, loading, disallowed } = this.props;
+		const { attributes, config, loading, disallowed, wallet } = this.props;
 		if (loading) return <LWSLoading />;
 		return (
 			<LWSRequiredInfo
 				attributes={attributes}
+				didRequired={config.did}
+				did={wallet.did}
 				notAllowedAttributes={disallowed}
 				website={config.website}
 				allowAction={this.handleAuth}
@@ -44,7 +47,8 @@ const ConnectedAttributesContainer = connect(state => ({
 	attributes: attributesSelectors.getAttributes(state),
 	config: appSelectors.getAppConfig(state),
 	loading: attributesSelectors.getLoading(state),
-	disallowed: attributesSelectors.getDisallowed(state)
+	disallowed: attributesSelectors.getDisallowed(state),
+	wallet: walletsSelectors.getSelected(state)
 }))(AttributesContainer);
 
 export default ConnectedAttributesContainer;

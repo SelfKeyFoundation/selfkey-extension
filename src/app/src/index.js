@@ -7,6 +7,7 @@ import AttributesContainer from './views/containers/AttributesContainer';
 import AuthFailedContainer from './views/containers/AuthFailedContainer';
 import AuthSuccessContainer from './views/containers/AuthSuccessContainer';
 import ErrorNoIdContainer from './views/containers/ErrorNoIdContainer';
+import ErrorNoDIDContainer from './views/containers/ErrorNoDIDContainer';
 import ErrorNoIDWContainer from './views/containers/ErrorNoIDWContainer';
 import { SelfkeyDarkTheme } from 'selfkey-ui';
 import { Router, Route } from 'react-router';
@@ -24,6 +25,7 @@ const RootHtml = () => (
 				<Route path="/:hash" component={App}>
 					<Route path="wallets" component={WalletsContainer} />
 					<Route path="error/no-id" component={ErrorNoIdContainer} />
+					<Route path="error/no-did" component={ErrorNoDIDContainer} />
 					<Route path="error/no-idw" component={ErrorNoIDWContainer} />
 					<Route path="auth/attributes" component={AttributesContainer} />
 					<Route path="auth/success" component={AuthSuccessContainer} />

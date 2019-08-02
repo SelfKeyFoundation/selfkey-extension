@@ -25,13 +25,19 @@ const loadAttributes = () => async (dispatch, getState) => {
 };
 
 const clearAttributes = () => async (dispatch, getState) => {
+	await dispatch(actions.setAttributesLoading(true));
 	const config = appSelectors.getAppConfig(getState());
-	const wallet = walletsSelectors.getSelected(getState());
-	if (wallet) {
-		await dispatch(walletsOperations.selectWallet(null));
+	try {
+		const wallet = walletsSelectors.getSelected(getState());
+		if (wallet) {
+			await dispatch(walletsOperations.selectWallet(null));
+		}
+		await dispatch(actions.updateAttributes(null));
+		await dispatch(push(`${config.hash}/wallets`));
+	} finally {
+		await dispatch(push(`${config.hash}/wallets`));
+		await dispatch(actions.setAttributesLoading(false));
 	}
-	await dispatch(actions.updateAttributes(null));
-	await dispatch(push(`${config.hash}/wallets`));
 };
 
 const authWithAttrs = () => async (dispatch, getState) => {
