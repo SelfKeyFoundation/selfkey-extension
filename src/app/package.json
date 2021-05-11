@@ -5,7 +5,7 @@
     "homepage": "/app/",
     "dependencies": {
         "classnames": "^2.2.6",
-        "lodash": "^4.17.12",
+        "lodash": "^4.17.21",
         "react": "^16.4.2",
         "react-dom": "^16.4.2",
         "react-redux": "^5.0.7",
